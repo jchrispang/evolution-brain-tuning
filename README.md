@@ -1,5 +1,5 @@
 # evolution-brain-tuning
-Code supporting 'Evolutionary constraints on human brain dynamics'
+Code and data for the manuscript "Evolutionary constraints on human brain dynamics"
 
 Using computational modeling to analyze changes in the tuning of brain dynamics across different species
 
