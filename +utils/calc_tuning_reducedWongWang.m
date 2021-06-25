@@ -1,7 +1,8 @@
 function [Smean, Hmean, Hmax] = calc_tuning_reducedWongWang(param, w_vec, tpre, num_trials)
 % calc_tuning_reducedWongWang.m
 %
-% Calculate tuning curve with respect to recurrent connection strength w
+% Calculate tuning curve from reduced Wong-Wang model with one excitatory
+% population with respect to recurrent connection strength w
 %
 % Inputs: param      : parameters of the model
 %         w_vec      : recurrent connection strengths (vector)

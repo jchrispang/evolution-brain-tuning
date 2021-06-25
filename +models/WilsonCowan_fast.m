@@ -1,7 +1,7 @@
 function sol = WilsonCowan_fast(param, P_E, P_I, y0)
 % WilsonCowan_fast.m
 %
-% Solves the Wilson-Cowan model without delau using the Euler-Maruyama method
+% Solves the Wilson-Cowan model without delay using the Euler-Maruyama method
 %
 % Inputs: param : parameters of the model
 %         y0    : initial conditions [Nx1]

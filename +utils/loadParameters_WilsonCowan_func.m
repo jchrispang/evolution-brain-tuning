@@ -32,10 +32,10 @@ function param = loadParameters_WilsonCowan_func
     param.w_EI      = 12;      % inhibitory to excitatory coupling [unitless]
     param.w_IE      = 15;      % excitatory to inhibitory coupling [unitless]
     param.w_II      = 3;       % inhibitory to inhibitory coupling [unitless]
-    param.G         = 1;       % global coupling strength [unitless]
+    param.G         = 2;       % global coupling strength [unitless]
 
     % input
-    param.G_E       = 0.5;       % scaling constant of excitatory drive [unitless]
+    param.G_E       = 0.5;     % scaling constant of excitatory drive [unitless]
     param.G_I       = 0;       % scaling constant of inhibitory drive [unitless]
 
     % firing rate parameters
