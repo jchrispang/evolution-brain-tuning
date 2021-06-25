@@ -5,16 +5,15 @@ Using computational modeling to analyze changes in the tuning of brain dynamics 
 
 # File descriptions
 
-1. sample_simulation.m: Matlab function to simulate the model
+1. demo_simulation.m: Matlab function to simulate the models
 2. generate_paper_figures.m: Matlab function to generate the figures of the paper
-3. +functions: package folder containing brain network model functions
+3. +models: package folder containing brain network model functions
 4. +utils: package folder containing utility analysis and visualization functions
 5. data: folder containing data to reproduce the results of the paper
-6. data_basic: folder containing minimum basic data needed to simulate the model
 
 # Dependencies
 
-Some important aspects you need to do before running generate_paper_figures_bioRxiv.m
+Some important aspects you need to do before running generate_paper_figures.m
 
 1. Download [cbrewer](https://au.mathworks.com/matlabcentral/fileexchange/34087-cbrewer-colorbrewer-schemes-for-matlab) and add to Matlab path.
 
