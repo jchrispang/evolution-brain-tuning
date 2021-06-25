@@ -1,10 +1,12 @@
 % demo_simulation.m
 
 %% load connectome data
+
 load('data/connectome_human.mat')
 load('data/connectome_chimp.mat')
 load('data/connectome_macaque.mat')
 load('data/connectome_marmoset.mat')
+
 
 %% reduced Wong-Wang model: generating and analyzing time series
 
@@ -195,3 +197,35 @@ subplot(1,2,2)
 plot(1:param.N, stats.dynamic_range, 'k.-')
 xlabel('region')
 ylabel('dynamic range')
+
+
+%% drift diffusion model: generating time series
+
+% load predefined drift diffusion model parameters
+param = utils.loadParameters_driftDiffusion_func;
+
+% define connectome matrix A
+type = 'human';
+param.A = eval(sprintf('connectome_%s', type));  % replace with your own connectivity matrix
+param.N = size(param.A, 2);
+
+% normalize connectivity matrix with respect to maximum weight
+normalization = 'maximum';
+param.A = utils.norm_matrix(param.A, normalization);  
+
+% define simulation time 
+param.tmax = 2;         
+param.tspan = [0, param.tmax];
+param.T = 0:param.tstep:param.tmax;
+
+% simulate model using predefined initial conditions (y0 = 0)
+sol = models.driftDiffusion_fast(param);
+
+% plot decision time series
+figure;
+plot(param.T, sol.y)
+yline(param.thres, 'k-', 'linewidth', 2);
+yline(-param.thres, 'k-', 'linewidth', 2);
+xlabel('time')
+ylabel('regional decision evidence')
+
