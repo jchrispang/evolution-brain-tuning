@@ -10,7 +10,7 @@ function W_norm = norm_matrix(W, normalization)
 % Output: W_norm         : normalized matrix [NxN]
 %
 % Original: James Pang, QIMR Berghofer, 2020
-% Revised:  James Pang, University, 2021
+% Revised:  James Pang, Monash University, 2021
 
 %%
 

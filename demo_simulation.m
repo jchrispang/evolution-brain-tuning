@@ -74,7 +74,7 @@ ylabel('timescale, \tau')
 param = utils.loadParameters_reducedWongWang_func;
 
 % define connectome matrix A
-type = 'macaque';
+type = 'human';
 param.A = eval(sprintf('connectome_%s', type));  % replace with your own connectivity matrix
 param.N = size(param.A, 2);
 

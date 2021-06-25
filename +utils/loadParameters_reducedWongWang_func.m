@@ -18,7 +18,7 @@ function param = loadParameters_reducedWongWang_func
 %    parameters are changed.
 %
 % Original: James Pang, QIMR Berghofer, 2020
-% Revised:  James Pang, University, 2021
+% Revised:  James Pang, Monash University, 2021
 
 %%
     % =====================================================================

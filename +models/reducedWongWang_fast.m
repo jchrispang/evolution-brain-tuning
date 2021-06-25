@@ -15,7 +15,7 @@ function sol = reducedWongWang_fast(param, y0)
 %       x_i = w*J*S_i + G*J*sum_j(A_ij*S_j) + I
 %
 % Original: James Pang, QIMR Berghofer, 2020
-% Revised:  James Pang, University, 2021
+% Revised:  James Pang, Monash University, 2021
 
 %%
 

@@ -10,7 +10,7 @@ function stats = calc_response_stats(x, F, F_transition)
 % Output: stats         : statistics (struct)
 %
 % Original: James Pang, QIMR Berghofer, 2020
-% Revised:  James Pang, University, 2021
+% Revised:  James Pang, Monash University, 2021
 
 %%
 

@@ -12,7 +12,7 @@ function [acf, lags, tau] = calc_timescales(F, maxlag, dt, tau_0)
 %          tau   : timescales [vector]
 %
 % Original: James Pang, QIMR Berghofer, 2021
-% Revised:  James Pang, University, 2021
+% Revised:  James Pang, Monash University, 2021
 
 %%
 

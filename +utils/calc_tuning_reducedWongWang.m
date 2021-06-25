@@ -13,7 +13,7 @@ function [Smean, Hmean, Hmax] = calc_tuning_reducedWongWang(param, w_vec, tpre, 
 %          Hmax      : maximum firing rate
 %
 % Original: James Pang, QIMR Berghofer, 2020
-% Revised:  James Pang, University, 2021
+% Revised:  James Pang, Monash University, 2021
 
 %%
 
