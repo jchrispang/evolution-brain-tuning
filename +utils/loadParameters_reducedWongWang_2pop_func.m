@@ -15,6 +15,9 @@ function param = loadParameters_reducedWongWang_2pop_func
 % 1. All the parameters can be changed by overwriting the existing instance 
 %   (example: param.w_E = 0.2 if you want to change the excitatory recurrent connection strength).
 %
+% 2. The dependent parameters need to be manually updated when other independent 
+%    parameters are changed.
+%
 % Original: James Pang, QIMR Berghofer, 2020
 % Revised:  James Pang, Monash University, 2021
 

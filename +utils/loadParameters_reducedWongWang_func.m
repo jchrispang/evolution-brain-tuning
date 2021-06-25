@@ -14,7 +14,7 @@ function param = loadParameters_reducedWongWang_func
 % 1. All the parameters can be changed by overwriting the existing instance 
 %    (example: param.w = 0.5 if you want to change the recurrent connection strength).
 %
-% 2. The depdendent parameters need to manually updated when other independent 
+% 2. The dependent parameters need to be manually updated when other independent 
 %    parameters are changed.
 %
 % Original: James Pang, QIMR Berghofer, 2020
