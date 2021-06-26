@@ -1,5 +1,5 @@
 function [acf, lags, tau] = calc_timescales(F, maxlag, dt, tau_0)
-% calc_response_stats.m
+% calc_timescales.m
 %
 % Calculate timescales of F
 %

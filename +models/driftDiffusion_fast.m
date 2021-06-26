@@ -1,5 +1,5 @@
 function sol = driftDiffusion_fast(param, y0)
-% driftDiffusion_fast_fast.m
+% driftDiffusion_fast.m
 %
 % Solves the dynamic MFM model with one excitatory/inhibitory population
 %

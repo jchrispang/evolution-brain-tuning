@@ -1,7 +1,7 @@
 function stats = calc_driftDiffusion_stats(y, T, thres)
 % calc_driftDiffusion_stats.m
 %
-% Calculate various statistics of the drift diffusion model.
+% Calculate various statistics of the drift diffusion model
 %
 % Inputs: y      : matrix of evidence [N x T x num_trials]
 %         T      : time [vector]
@@ -10,6 +10,7 @@ function stats = calc_driftDiffusion_stats(y, T, thres)
 % Output: stats  : statistics (struct)
 %
 % Original: James Pang, QIMR Berghofer, 2020
+% Revised:  James Pang, Monash University, 2021
 
 %%
 

@@ -1,5 +1,5 @@
 function W_norm = norm_matrix(W, normalization)
-% norm_connectome.m
+% norm_matrix.m
 %
 % Normalize connectome according to method
 %
