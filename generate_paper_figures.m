@@ -638,6 +638,15 @@ for type_ind = 1:length(types)
     ax3_image= axes('Position', [ax3.Position(1)+0.02 ax3.Position(2)+ax3.Position(4)*0.7 0.05 0.05]);
     imshow(bw);
     colormap(ax3_image, flipud(gray))
+    
+    if type_ind==2
+        ax3_inset = axes('Position', [ax3.Position(1)+0.07 ax3.Position(2)+0.08 ax3.Position(3)*0.25 ax3.Position(4)*0.25]);
+        plot(data_to_plot_x, data_to_plot_y, '.', 'color', cmap(type_ind,:), 'markersize', 10)
+        set(ax3_inset, 'fontsize', fontsize_axis-4, 'ticklength', [0.02, 0.02], ...
+            'ytick', [0.1, 0.15, 0.2, 0.25], 'ylim', [0.1 0.25], 'box', 'on')
+        xlabel('dynamic range', 'fontsize', fontsize_label-4, 'interpreter', 'latex')
+        ylabel('$\tau$', 'fontsize', fontsize_label-4, 'interpreter', 'latex')
+    end
 end
 
 %%% panel letters
