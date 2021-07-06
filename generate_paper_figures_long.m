@@ -1,4 +1,4 @@
-% generate_paper_figures.m
+% generate_paper_figures_long.m
 % 
 % Matlab code to generate the main figures of the paper
 
@@ -39,10 +39,12 @@ marmoset = imread('artworks/marmoset.png');
 fontsize_axis = 10;
 fontsize_label = 12;
 
+data_foldername = 'data/data_figures_long';
+
 %% FIGURE 1
 
 % load all data relevant to Figure 1
-data_Figure1 = load('data/data_figures/Figure1.mat');
+data_Figure1 = load(sprintf('%s/Figure1.mat', data_foldername));
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
@@ -210,7 +212,7 @@ annotation(fig, 'textbox', [0.61, 0.98 0.01, 0.01], 'string', 'C', 'edgecolor', 
 %% FIGURE 2
 
 % load all data relevant to Figure 2
-data_Figure2 = load('data/data_figures/Figure2.mat');
+data_Figure2 = load(sprintf('%s/Figure2.mat', data_foldername));
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
@@ -421,7 +423,7 @@ annotation(fig, 'textbox', [0.1, 0.25, 0.01, 0.01], 'string', 'D', 'edgecolor', 
 %% FIGURE 3
 
 % load all data relevant to Figure 3
-data_Figure3 = load('data/data_figures/Figure3.mat');
+data_Figure3 = load(sprintf('%s/Figure3.mat', data_foldername));
 
 types = {'human', 'chimp', 'macaque', 'marmoset'};
 titles = {'human', 'chimpanzee', 'macaque', 'marmoset'};
@@ -538,7 +540,7 @@ annotation(fig, 'textbox', [0.05, 0.5, 0.01, 0.01], 'string', 'B', 'edgecolor', 
 %% FIGURE 4
 
 % load all data relevant to Figure 4
-data_Figure4 = load('data/data_figures/Figure4.mat');
+data_Figure4 = load(sprintf('%s/Figure4.mat', data_foldername));
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
@@ -661,7 +663,7 @@ annotation(fig, 'textbox', [0.03, 0.36, 0.01, 0.01], 'string', 'C', 'edgecolor',
 %% FIGURE 5
 
 % load all data relevant to Figure 5
-data_Figure5 = load('data/data_figures/Figure5.mat');
+data_Figure5 = load(sprintf('%s/Figure5.mat', data_foldername));
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
