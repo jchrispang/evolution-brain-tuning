@@ -24,7 +24,7 @@ Some important aspects you need to do before running generate_paper_figures.m
 
 If you use our code in your research, please cite us as follows:
 
-J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary constraints on human brain dynamics, (2021) (DOI: XXX)
+J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary shaping of human brain dynamics, (2021) (DOI: XXX)
 
 ## Further details
 
