@@ -1,6 +1,11 @@
 % demo_simulation.m
 % 
 % Matlab code to demonstrate simulation of the models
+%
+% Note that this demo sweeps the time and w parameters with a short period 
+% and a coarse resolution, respectively, to reduce computational load and 
+% produce sample outputs quickly. These parameters must be changed for a 
+% proper analysis. See WARNING notes below to see what needs to be changed.
 
 %% LOAD SOME CONNECTOME MATRICES
 
@@ -29,7 +34,7 @@ param.A = utils.norm_matrix(param.A, normalization);
 
 % define simulation time 
 tpre =  100;                                     % burn time to remove transient
-tpost = 50;                                      % steady-state time (it is advisable to increase this to reach ergodicity)
+tpost = 50;                                      % steady-state time (WARNING: it is advisable to increase this to reach ergodicity)
 param.tmax = tpre + param.tstep + tpost;         
 param.tspan = [0, param.tmax];
 param.T = 0:param.tstep:param.tmax;
@@ -79,7 +84,7 @@ ylabel('timescale, \tau')
 % =========================================================================
 
 % define vector of recurrent connection strengths and number of trials
-w_vec = 0.05:0.05:1;  % make sure to increase resolution for a proper analysis
+w_vec = 0.05:0.02:1;    % WARNING: make sure to increase resolution for a proper analysis
 num_trials = 1;
 
 % calculate tuning curve per region
@@ -122,7 +127,7 @@ param.A = utils.norm_matrix(param.A, normalization);
 
 % define simulation time 
 tpre =  5;                                     % burn time to remove transient
-tpost = 0.2;                                   % steady-state time (it is advisable to increase this to reach ergodicity)
+tpost = 0.2;                                   % steady-state time (WARNING: it is advisable to increase this to reach ergodicity)
 param.tmax = tpre + param.tstep + tpost;         
 param.tspan = [0, param.tmax];
 param.T = 0:param.tstep:param.tmax;
@@ -149,7 +154,7 @@ ylabel('excitatory firing rate, S_E')
 % =========================================================================
 
 % define vector of excitatory to excitatory connection strengths and number of trials
-wEE_vec = 1:1:30;  % make sure to increase resolution for a proper analysis
+wEE_vec = 1:0.05:30;        % WARNING: make sure to increase resolution for a proper analysis
 num_trials = 1;
 
 % calculate tuning curve per region
