@@ -18,7 +18,11 @@ Some important aspects you need to do before running generate_paper_figures.m
 
 1. Download [cbrewer](https://au.mathworks.com/matlabcentral/fileexchange/34087-cbrewer-colorbrewer-schemes-for-matlab) and add to Matlab path.
 
-2. Download the [Brain Connectivity Toolbox](https://sites.google.com/site/bctnet/) and add to Matlab path.
+2. Download the latest version (2019) of the [Brain Connectivity Toolbox](https://sites.google.com/site/bctnet/) and add to Matlab path.
+
+## Compatibility
+
+The codes have been tested on versions of MATLAB from R2017a to R2020b.
 
 ## Citation
 
