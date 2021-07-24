@@ -30,7 +30,7 @@ for w_ind = 1:length(wEE_vec)
     param.w_EE = wEE_vec(w_ind);
     
     for trial = 1:num_trials
-        sol = models.WilsonCowan_fast(param);
+        sol = models.WilsonCowan(param);
 
         SEmean(:,w_ind,trial) = mean(sol.y_E(:,time_steady_ind:end),2);
         SImean(:,w_ind,trial) = mean(sol.y_I(:,time_steady_ind:end),2);

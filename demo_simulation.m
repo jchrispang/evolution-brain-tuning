@@ -40,7 +40,7 @@ param.tspan = [0, param.tmax];
 param.T = 0:param.tstep:param.tmax;
 
 % simulate model using predefined initial conditions (y0 = 0.001)
-sol = models.reducedWongWang_fast(param);
+sol = models.reducedWongWang(param);
 
 % obtain steady-state synaptic gating and firing rate time series per region
 time_steady_ind = dsearchn(param.T', tpre)+1;                       % index of start of steady state
@@ -133,7 +133,7 @@ param.tspan = [0, param.tmax];
 param.T = 0:param.tstep:param.tmax;
 
 % simulate model using predefined initial conditions (y0 = 0.001)
-sol = models.WilsonCowan_fast(param);
+sol = models.WilsonCowan(param);
 
 % obtain steady-state synaptic gating and firing rate time series per region
 time_steady_ind = dsearchn(param.T', tpre)+1;      % index of start of steady state
@@ -201,7 +201,7 @@ param.tspan = [0, param.tmax];
 param.T = 0:param.tstep:param.tmax;
 
 % simulate model using predefined initial conditions (y0 = 0)
-sol = models.driftDiffusion_fast(param);
+sol = models.driftDiffusion(param);
 
 % plot decision time series
 figure;

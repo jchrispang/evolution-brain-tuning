@@ -31,7 +31,7 @@ for w_ind = 1:length(w_vec)
     param.w = w_vec(w_ind);
     
     for trial = 1:num_trials
-        sol = models.reducedWongWang_fast(param);
+        sol = models.reducedWongWang(param);
         S = sol.y;                                             % synaptic gating
         H = utils.calc_firingRate_reducedWongWang(param, S);   % firing rate
 
