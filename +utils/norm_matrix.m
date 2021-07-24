@@ -19,7 +19,7 @@ if nargin<2
 end
 
 if strcmpi(normalization, 'maximum')
-    W_norm = W/max(W,[],'all');
+    W_norm = W/max(W(:));
 elseif strcmpi(normalization, 'in_strength')
     node_strength = sum(W,2);
     W_norm = bsxfun(@rdivide, W, node_strength);

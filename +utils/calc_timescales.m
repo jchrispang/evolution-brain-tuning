@@ -24,9 +24,13 @@ N = size(F,1);
 tau = zeros(size(F,1), 1);
 
 for node = 1:N
-    [acf(node,:), temp_lags, ~] = autocorr(F(node,:), 'numlags', floor(maxlag/dt));
-    lags = temp_lags*dt;
-
+%     [acf(node,:), temp_lags, ~] = autocorr(F(node,:), 'numlags', floor(maxlag/dt));
+%     lags = temp_lags*dt;
+    [acf_temp, temp_lags] = xcorr(F(node,:)-mean(F(node,:)), floor(maxlag/dt));
+    acf_temp = acf_temp((floor(length(temp_lags)/2)+1):end);
+    acf(node,:) = acf_temp/acf_temp(1);
+    lags = temp_lags((floor(length(temp_lags)/2)+1):end)*dt;
+    
     fun = @(beta,x) beta(1)*exp(-x/beta(2))+beta(3);
     beta0 = [1, tau_0, 0];
     

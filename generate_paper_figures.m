@@ -185,11 +185,11 @@ ylabel({'regional synaptic'; 'gating, $S$'}, 'fontsize', fontsize_label, 'interp
 node = 53;
 ax4 = axes('Position', [ax3.Position(1)+ax3.Position(3)*2.1 0.15 0.3 0.77]);
 hold on;
-plot(data_Figure1.tuningcurve.w, data_Figure1.tuningcurve.S(node,:), 'k.')
-xline(data_Figure1.tuningcurve.stats.xval_10(node), ':');
-xline(data_Figure1.tuningcurve.stats.xval_90(node), ':');
-yline(data_Figure1.tuningcurve.stats.Fval_10(node), ':');
-yline(data_Figure1.tuningcurve.stats.Fval_90(node), ':');
+plot(data_Figure1.tuningcurve.w, data_Figure1.tuningcurve.S(node,:), 'k.');
+plot(data_Figure1.tuningcurve.stats.xval_10(node)*ones(1,2), [0, 1], 'k:');
+plot(data_Figure1.tuningcurve.stats.xval_90(node)*ones(1,2), [0, 1], 'k:');
+plot(data_Figure1.tuningcurve.w, data_Figure1.tuningcurve.stats.Fval_10(node)*(ones(size(data_Figure1.tuningcurve.w))), 'k:');
+plot(data_Figure1.tuningcurve.w, data_Figure1.tuningcurve.stats.Fval_90(node)*(ones(size(data_Figure1.tuningcurve.w))), 'k:');
 hold off;
 text(data_Figure1.tuningcurve.stats.xval_10(node), data_Figure1.tuningcurve.stats.Fval_10(node)-0.03, '($w_{10}$, $S_{10}$)', 'fontsize', fontsize_label, 'interpreter', 'latex')
 text(data_Figure1.tuningcurve.stats.xval_90(node), data_Figure1.tuningcurve.stats.Fval_90(node)-0.03, '($w_{90}$, $S_{90}$)', 'fontsize', fontsize_label, 'interpreter', 'latex')
@@ -641,10 +641,11 @@ data_to_plot_y = mean(data_Figure4.decision.accuracy{1},1)-mean(data_Figure4.dec
 [~, min_diff_ind] = min(data_to_plot_y);
 hold on;
 plot(data_to_plot_x, data_to_plot_y, 'k-', 'linewidth', 2)
+plot(data_to_plot_x, 0*(ones(size(data_to_plot_x))), 'k:');
+plot(data_to_plot_x(min_diff_ind)*ones(1,2), get(gca,'ylim'), 'k--');
 hold off;
-yline(0, 'k:');
-xline(data_to_plot_x(min_diff_ind), 'k--', '$t_{\rm min}$', ...
-    'LabelVerticalAlignment', 'middle', 'LabelHorizontalAlignment', 'center', 'interpreter', 'latex');
+text(data_to_plot_x(min_diff_ind), min(get(gca,'ylim')), '$t_{\rm min}$', 'interpreter', 'latex', ...
+     'horizontalalignment', 'center', 'verticalalignment', 'top', 'fontsize', fontsize_label)
 set(ax3, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 1.5])
 xlabel('time (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
 ylabel({'human -- chimpanzee'; 'whole-brain accuracy ($\%$)'}, 'fontsize', fontsize_label, 'interpreter', 'latex')

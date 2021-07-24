@@ -205,9 +205,11 @@ sol = models.driftDiffusion(param);
 
 % plot decision time series
 figure;
+hold on;
 plot(param.T, sol.y)
-yline(param.thres, 'k-', 'linewidth', 2);
-yline(-param.thres, 'k-', 'linewidth', 2);
+plot(param.T, param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
+plot(param.T, -param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
+hold off;
 xlabel('time')
 ylabel('regional decision evidence')
 
