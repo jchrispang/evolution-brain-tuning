@@ -688,6 +688,12 @@ for type_ind=1:length(types)
     colormap(ax4_image, flipud(gray))
 end
 
+%%% titles
+annotation(fig, 'textbox', [0.1, 0.985, 0.85, 0.01], 'string', 'neural timescales', 'edgecolor', 'none', ...
+        'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center', 'verticalalignment', 'middle')
+annotation(fig, 'textbox', [0.1, 0.475, 0.85, 0.01], 'string', 'computational capacity', 'edgecolor', 'none', ...
+        'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center', 'verticalalignment', 'middle')
+    
 %%% panel letters
 annotation(fig, 'textbox', [0.03, 0.97, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
