@@ -1,5 +1,5 @@
-function sol = reducedWongWang_fast(param, y0)
-% reducedWongWang_fast.m
+function sol = reducedWongWang(param, y0)
+% reducedWongWang.m
 %
 % Solves the reduced Wong-Wang model with one excitatory population
 % using the Euler-Maruyama method
