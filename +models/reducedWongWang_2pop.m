@@ -7,7 +7,10 @@ function sol = reducedWongWang_2pop(param, y0)
 % Inputs: param : parameters of the model
 %         y0    : initial conditions [Nx1]
 %
-% Output: sol   : solutions [NxT]
+% Output: sol   : output (struct)
+%                 fields: x, y_E, y_I
+%                 x = time [1xT]
+%                 y_E and y_I = solutions [NxT]
 %
 % Equation:
 % \dot{S^E_i} = -S^E_i/tau_E + gamma*(1-S^E_i)*H(x^E_i) + sigma*v_i(t)

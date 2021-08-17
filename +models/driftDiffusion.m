@@ -6,7 +6,10 @@ function sol = driftDiffusion(param, y0)
 % Inputs: param : parameters of the model
 %         y0    : initial conditions [Nx1]
 %
-% Output: sol   : solutions [NxT]
+% Output: sol   : output (struct)
+%                 fields: x, y
+%                 x = time [1xT]
+%                 y = solutions [NxT]
 %
 % Equation:
 % \dot{y} = beta_i + sigma*v_i(t)

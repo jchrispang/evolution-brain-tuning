@@ -8,7 +8,10 @@ function sol = WilsonCowan(param, P_E, P_I, y0)
 %         P_E   : excitatory drive per node [Nx1]
 %         P_I   : inhibitory drive per node [Nx1]
 %
-% Output: sol   : solutions [NxT]
+% Output: sol   : output (struct)
+%                 fields: x, y_E, y_I
+%                 x = time [1xT]
+%                 y_E and y_I = solutions [NxT]
 %
 % Equation:
 % \dot{S^E_i} = (1/tau_E)*{-S^E_i + [1 - S^E_i]*H(x^E_i) + sigma_E*xi_i}
