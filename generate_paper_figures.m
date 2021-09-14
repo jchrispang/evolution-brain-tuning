@@ -217,6 +217,7 @@ data_Figure2 = load(sprintf('%s/Figure2.mat', data_foldername));
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
 
+N = 114;
 cmap = [color_brown; color_green];
 S_transition = 0.3;
 stats_to_plot = 'dynamic_range';
@@ -574,17 +575,36 @@ types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
 
 cmap = [color_brown; color_green];
+thres = 1;
+
+edge_alpha = 0.8;
+edge_width = 1;
+           
+N = 114;
+slice = 'axial';   
+node_interests = [86,84];
+frac = 0.05;
+markersize = 100;
+node_interests_colors = brighten(lines(6),0.3);
+node_interests_colors = node_interests_colors([4,6],:);
+node_cmap = [1, 1, 1; node_interests_colors];
+node_cval = ones(N,1);
+node_cval(node_interests(1)) = 2;
+node_cval(node_interests(2)) = 3;
+nodeLocations = region_centroids;
+nodeSizes = (markersize/10)*ones(N,1);
+nodeSizes(node_interests) = markersize;
 
 w_interest = 0.45;
 w_interest_ind = dsearchn(data_Figure4.tuningcurve.w', w_interest);
 
-image_width = 0.05;
+image_width = 0.04;
 
 fig = figure('Position', [200 200 700 700]);
 % =========================================================================
 % A: correlation of timescales and dynamic range
 % =========================================================================
-ax0 = axes('Position', [0.1 0.58 0.4 0.36]);
+ax0 = axes('Position', [0.1 0.71 0.4 0.23]);
 ax0_position = ax0.Position;
 set(ax0,'visible','off')
 
@@ -612,7 +632,7 @@ for type_ind = 1:length(types)
     [rho,pval] = corr(data_to_plot_x, data_to_plot_y, 'type', 'pearson');
     text(max(get(ax1,'xlim')), 32, sprintf('r = %.2g', rho), ...
         'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
-    text(max(get(ax1,'xlim')), 25, sprintf('p = %.2g', pval), ...
+    text(max(get(ax1,'xlim')), 23, sprintf('p = %.2g', pval), ...
         'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
     title(titles{type_ind}, 'fontsize', fontsize_label)
  
@@ -622,9 +642,104 @@ for type_ind = 1:length(types)
 end
 
 % =========================================================================
-% B: human - chimpanzee whole-brain accuracy
+% B left: brain network
 % =========================================================================
-ax3 = axes('Position', [ax0_position(1) 0.07 ax0_position(3) ax0_position(4)]);
+ax2 = axes('Position', [0.0 0.34 0.3 ax0_position(4)]);
+ 
+W = connectome_human;
+[edge_X, edge_Y, edge_Z] = adjacency_plot_und(threshold_proportional(W, frac), nodeLocations);  % get all the edges
+[nodeLocations, edges] = extract_scatterBrain_locs_edges(nodeLocations, edge_X, edge_Y, edge_Z, slice);
+ 
+hold on;
+if strcmpi(slice, 'axial')
+    scatter3(ax2, nodeLocations(:,1), nodeLocations(:,2), max(nodeLocations(:,3))*ones(N,1), ...
+             nodeSizes, node_cval, 'filled', 'markeredgecolor', 'k');
+else
+    scatter3(ax2, nodeLocations(:,1), nodeLocations(:,2), nodeLocations(:,3), ...
+         nodeSizes, node_cval, 'filled', 'markeredgecolor', 'k');
+end
+plot3(edges(:,1), edges(:,2), edges(:,3), 'color', 'k', 'linewidth', edge_width);
+hold off;
+text(nodeLocations(node_interests(1),1)+6, nodeLocations(node_interests(1),2), max(nodeLocations(:,3)), 'region $i$', ...
+    'horizontalalignment', 'left', 'fontsize', fontsize_axis, 'interpreter', 'latex')
+text(nodeLocations(node_interests(2),1)+6, nodeLocations(node_interests(2),2), max(nodeLocations(:,3)), 'region $j$', ...
+    'horizontalalignment', 'left', 'fontsize', fontsize_axis, 'interpreter', 'latex')
+text(-37, -45, 'LH', 'horizontalalignment', 'center', 'fontsize', fontsize_axis, ...
+    'fontweight', 'b')
+text(37, -45, 'RH', 'horizontalalignment', 'center', 'fontsize', fontsize_axis, ...
+    'fontweight', 'b')
+colormap(ax2, node_cmap)
+view(ax2, 2)
+axis(ax2, 'equal')
+set(ax2, 'visible', 'off')
+
+% =========================================================================
+% B right: drift diffusion model schematic
+% =========================================================================
+ax3 = axes('Position', [ax2.Position(1)+ax2.Position(3)*1.05 ax2.Position(2) 0.4 ax2.Position(4)]);
+circle_locs_x = [0.25, 0.57];
+circle_locs_y = [0.5, 0.5];
+hold on;
+plot(circle_locs_x, circle_locs_y, 'k-', 'linewidth', 3)
+plot(circle_locs_x(1), circle_locs_y(1), 'ko', 'markersize', 45, 'markerfacecolor', node_interests_colors(1,:))
+plot(circle_locs_x(2), circle_locs_y(2), 'ko', 'markersize', 45, 'markerfacecolor', node_interests_colors(2,:))
+hold off;
+set(ax3, 'xtick', [], 'ytick', [], 'xlim', [0 1], 'ylim', [0 1])
+ 
+% annotation lines
+annotation('arrow', [ax3.Position(1)+ax3.Position(3)*circle_locs_x(1) ax3.Position(1)+ax3.Position(3)*circle_locs_x(1)], [ax3.Position(2)+ax3.Position(4)*0.84 ax3.Position(2)+ax3.Position(4)*0.65], ...
+    'linewidth', 3, 'headlength', 10, 'headwidth', 18)
+annotation('arrow', [ax3.Position(1)+ax3.Position(3)*circle_locs_x(2) ax3.Position(1)+ax3.Position(3)*circle_locs_x(2)], [ax3.Position(2)+ax3.Position(4)*0.84 ax3.Position(2)+ax3.Position(4)*0.65], ...
+    'linewidth', 3, 'headlength', 10, 'headwidth', 18)
+annotation('arrow', [ax3.Position(1)+ax3.Position(3)*circle_locs_x(1) ax3.Position(1)+ax3.Position(3)*circle_locs_x(1)], [ax3.Position(2)+ax3.Position(4)*0.16 ax3.Position(2)+ax3.Position(4)*0.35], ...
+    'linewidth', 3, 'headlength', 10, 'headwidth', 18)
+annotation('arrow', [ax3.Position(1)+ax3.Position(3)*circle_locs_x(2) ax3.Position(1)+ax3.Position(3)*circle_locs_x(2)], [ax3.Position(2)+ax3.Position(4)*0.16 ax3.Position(2)+ax3.Position(4)*0.35], ...
+    'linewidth', 3, 'headlength', 10, 'headwidth', 18)
+ 
+% texts
+text(circle_locs_x(1), circle_locs_y(1), {'region'; '$i$'}, 'horizontalalignment', 'center', 'fontsize', fontsize_label, 'interpreter', 'latex')
+text(circle_locs_x(2), circle_locs_y(2), {'region'; '$j$'}, 'horizontalalignment', 'center', 'fontsize', fontsize_label, 'interpreter', 'latex')
+text(circle_locs_x(1), circle_locs_y(1)+0.41, '$\beta$', 'horizontalalignment', 'center', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(2), circle_locs_y(1)+0.41, '$\beta$', 'horizontalalignment', 'center', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(mean(circle_locs_x), circle_locs_y(1), '$L_{ij}$', 'horizontalalignment', 'center', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(1), circle_locs_y(1)-0.36, '$D$', 'horizontalalignment', 'center', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(2), circle_locs_y(1)-0.36, '$D$', 'horizontalalignment', 'center', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+axis off
+
+% =========================================================================
+% C: time series
+% =========================================================================
+ax4 = axes('Position', [ax3.Position(1)+ax3.Position(3)*1.02 ax3.Position(2)+ax3.Position(4)*0.65 ax3.Position(3)*0.48 ax3.Position(4)*0.3]);
+hold on;
+plot(data_Figure4.timeseries.time, data_Figure4.timeseries.y(node_interests(1),:), 'color', node_interests_colors(1,:), 'linewidth', 1.5)
+plot(data_Figure4.timeseries.time, data_Figure4.timeseries.y(node_interests(2),:), 'color', node_interests_colors(2,:), 'linewidth', 1.5)
+yline(thres, 'k-', 'linewidth', 2);
+yline(-thres, 'k-', 'linewidth', 2);
+hold off;
+text(4, thres, 'correct', ...
+    'horizontalalignment', 'left', 'verticalalignment', 'middle','fontsize', fontsize_axis, 'fontweight', 'b', 'color', 'b')
+text(4, -thres, 'incorrect', ...
+    'horizontalalignment', 'left', 'verticalalignment', 'middle','fontsize', fontsize_axis, 'fontweight', 'b', 'color', 'r')
+set(ax4, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 4], 'ylim', [-thres,thres], 'ytick', []);
+xlabel('time (s)', 'fontsize', fontsize_axis, 'interpreter', 'latex')
+ylabel({'regional'; 'decision evidence'}, 'fontsize', fontsize_axis, 'interpreter', 'latex')
+
+% =========================================================================
+% D: accuracy vs time
+% =========================================================================
+ax5 = axes('Position', [ax4.Position(1) ax4.Position(2)-ax4.Position(4)*1.9 ax4.Position(3) ax4.Position(4)]);
+hold on;
+plot(data_Figure4.timeseries.time, data_Figure4.timeseries.accuracy(node_interests(1),:), 'color', node_interests_colors(1,:), 'linewidth', 1.5)
+plot(data_Figure4.timeseries.time, data_Figure4.timeseries.accuracy(node_interests(2),:), 'color', node_interests_colors(2,:), 'linewidth', 1.5)
+hold off;
+set(ax5, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 1.5]);
+xlabel('time (s)', 'fontsize', fontsize_axis, 'interpreter', 'latex')
+ylabel({'regional'; 'accuracy ($\%$)'}, 'fontsize', fontsize_axis, 'interpreter', 'latex')
+
+% =========================================================================
+% E: human - chimpanzee whole-brain accuracy
+% =========================================================================
+ax6 = axes('Position', [ax0_position(1) 0.05 ax0_position(3) ax0_position(4)]);
 data_to_plot_x = data_Figure4.decision.time;
 data_to_plot_y = mean(data_Figure4.decision.accuracy{1},1)-mean(data_Figure4.decision.accuracy{2},1);
 [~, min_diff_ind] = min(data_to_plot_y);
@@ -635,24 +750,24 @@ plot(data_to_plot_x(min_diff_ind)*ones(1,2), get(gca,'ylim'), 'k--');
 hold off;
 text(data_to_plot_x(min_diff_ind), min(get(gca,'ylim')), '$t_{\rm min}$', 'interpreter', 'latex', ...
      'horizontalalignment', 'center', 'verticalalignment', 'top', 'fontsize', fontsize_label)
-set(ax3, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 1.5])
+set(ax6, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 1.5])
 xlabel('time (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
 ylabel({'human -- chimpanzee'; 'whole-brain accuracy ($\%$)'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
 
 % =========================================================================
-% C: correlation of accuracy at tmin with dynamic range
+% F: correlation of accuracy at tmin with dynamic range
 % =========================================================================
 for type_ind=1:length(types)
     if type_ind==1
         image_to_plot = human_female;
-        yloc = ax3.Position(2)+ax3.Position(4)*0.6;
+        yloc = ax6.Position(2)+ax6.Position(4)*0.6;
     elseif type_ind==2
         image_to_plot = chimpanzee;
-        yloc = ax3.Position(2);
+        yloc = ax6.Position(2);
     end
     bw = image_to_plot>0;
     
-    ax4 = axes('Position', [ax3.Position(1)+ax3.Position(3)+0.12 yloc ax3.Position(3)*0.9 ax3.Position(4)*0.4]);
+    ax7 = axes('Position', [ax6.Position(1)+ax6.Position(3)+0.12 yloc ax6.Position(3)*0.9 ax6.Position(4)*0.4]);
     data_to_plot_x = zscore(data_Figure4.tuningcurve.stats{type_ind}.dynamic_range);
     data_to_plot_y = squeeze(data_Figure4.decision.accuracy{type_ind}(:,min_diff_ind));
     hold on;
@@ -660,7 +775,7 @@ for type_ind=1:length(types)
     plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
         'k-', 'linewidth', 2);
     hold off;
-    set(ax4, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'ylim', [10 50], 'box', 'off')
+    set(ax7, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'ylim', [10 50], 'box', 'off')
     if type_ind==2
         xlabel('dynamic range (z score)', 'fontsize', fontsize_label, 'interpreter', 'latex')
     end
@@ -673,22 +788,28 @@ for type_ind=1:length(types)
     text(max(get(gca, 'xlim'))*0.95, max(get(gca, 'ylim'))*0.78, sprintf('p = %.2g', pval), ...
         'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'bottom', 'horizontalalignment', 'right');
  
-    ax4_image = axes('Position', [ax4.Position(1)+0.01 ax4.Position(2)+ax4.Position(4)*0.75 image_width image_width]);
+    ax7_image = axes('Position', [ax7.Position(1)+0.01 ax7.Position(2)+ax7.Position(4)*0.75 image_width image_width]);
     imshow(bw);
-    colormap(ax4_image, flipud(gray))
+    colormap(ax7_image, flipud(gray))
 end
 
 %%% titles
-annotation(fig, 'textbox', [0.1, 0.985, 0.85, 0.01], 'string', 'neural timescales', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.1, 0.985, 0.8, 0.01], 'string', 'neural timescales', 'edgecolor', 'none', ...
         'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center', 'verticalalignment', 'middle')
-annotation(fig, 'textbox', [0.1, 0.475, 0.85, 0.01], 'string', 'computational capacity', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.1, 0.62, 0.8, 0.01], 'string', 'computational capacity', 'edgecolor', 'none', ...
         'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center', 'verticalalignment', 'middle')
     
 %%% panel letters
-annotation(fig, 'textbox', [0.03, 0.97, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.03, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.03, 0.46, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.03, 0.59, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.54, 0.46, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.64, 0.59, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.64, 0.46, 0.01, 0.01], 'string', 'D', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.03, 0.31, 0.01, 0.01], 'string', 'E', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.54, 0.31, 0.01, 0.01], 'string', 'F', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
     
