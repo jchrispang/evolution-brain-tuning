@@ -28,6 +28,14 @@ color_brown = cb(7,:);
 color_green = cb(3,:);
 color_blue = cb(2,:);
 color_purple = cb(4,:);
+color_orange = cb(5,:);
+cb = cbrewer('qual', 'Accent', 8, 'pchip');
+color_brown_light = cb(7,:);
+cb = cbrewer('qual', 'Dark2', 8, 'pchip');
+color_green_light = cb(1,:);
+color_brown_lighter = cb(7,:);
+cb = cbrewer('qual', 'Set2', 8, 'pchip');
+color_green_lighter = cb(1,:);
 
 % artworks
 human_female = imread('artworks/human_female_2.png');
@@ -648,7 +656,7 @@ ax2 = axes('Position', [0.0 0.34 0.3 ax0_position(4)]);
  
 W = connectome_human;
 [edge_X, edge_Y, edge_Z] = adjacency_plot_und(threshold_proportional(W, frac), nodeLocations);  % get all the edges
-[nodeLocations, edges] = extract_scatterBrain_locs_edges(nodeLocations, edge_X, edge_Y, edge_Z, slice);
+[nodeLocations, edges] = utils.extract_scatterBrain_locs_edges(nodeLocations, edge_X, edge_Y, edge_Z, slice);
  
 hold on;
 if strcmpi(slice, 'axial')
