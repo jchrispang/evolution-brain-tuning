@@ -19,7 +19,8 @@ function ax = draw_brain_nodeHighlight(ax, node_interest, nodeLocations, ...
 % Outputs: ax                      : redefine initial axis handle
 %
 % Original: James Pang, QIMR Berghofer, 2020
- 
+% Revised:  James Pang, Monash University, 2021
+
 %%
 if strcmpi(slice, 'axial')
     nodeLocations = cat(2, nodeLocations(:,1), nodeLocations(:,2), nodeLocations(:,3));
