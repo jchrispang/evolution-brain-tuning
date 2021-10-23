@@ -33,7 +33,7 @@ The codes have been tested on versions of MATLAB from R2017a to R2020b.
 
 Note that the configuration of your computer (e.g., screen resolution) affects how the figures created by running generate_paper_figures.m and generate_paper_suppfigures.m will look. Hence, they will not 100% visually match the figures in the paper, but the scientific contents are replicated.
 
-## Citation
+## Citation (TO BE UPDATED)
 
 If you use our code in your research, please cite us as follows:
 
