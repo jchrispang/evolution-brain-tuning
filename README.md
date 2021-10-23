@@ -13,6 +13,10 @@ Using computational modeling to study changes in the tuning of brain dynamics ac
 6. generate_paper_figures.m: code to generate the main figures of the paper
 7. generate_paper_suppfigures.m: code to generate the supplementary figures of the paper
 
+## Installation
+
+Download the repository and add to your Matlab path
+
 ## Dependencies
 
 Some important aspects you need to do before running generate_paper_figures.m
