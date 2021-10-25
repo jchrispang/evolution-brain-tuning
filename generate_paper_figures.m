@@ -10,6 +10,7 @@ load('data/connectome_macaque.mat')
 load('data/connectome_marmoset.mat')
 load('data/region_props_chimp.mat', 'region_centroids', 'region_names') 
 load('data/RSN.mat', 'RSN_indices', 'RSN_names')
+load('data/macaque_networks.mat', 'networks_indices', 'networks_names')
 
 %% DEFINE FIGURE-RELATED PROPERTIES
 
@@ -22,6 +23,7 @@ Yeo_7net_colormap = [120, 18, 134;
                      205, 62, 78;
                      200, 200, 200]/255;
 Yeo_names = {'VIS', 'SM', 'DA', 'VA', 'LIM', 'FP', 'DM'};
+macaque_network_names = {'FRONT', 'TEMP', 'PAR', 'OCC', 'LIM'};
 
 cb = cbrewer('qual', 'Set1', 8, 'pchip');
 color_brown = cb(7,:);
@@ -820,4 +822,129 @@ annotation(fig, 'textbox', [0.03, 0.31, 0.01, 0.01], 'string', 'E', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 annotation(fig, 'textbox', [0.54, 0.31, 0.01, 0.01], 'string', 'F', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+
+%% FIGURE 5
+
+% load all data relevant to Figure 5
+data_Figure5 = load(sprintf('%s/Figure5.mat', data_foldername));
+
+types = {'human', 'macaque'};
+titles = {'human', 'macaque'};
+
+cmap = [color_brown; color_blue];
+
+image_width = 0.06;
+ 
+fig = figure('Position', [200 200 600 500]);
+ax0 = axes('Position', [0.12 0.62 0.35 0.3]);
+ax0_position = ax0.Position;
+set(ax0,'visible','off')
+ 
+% =========================================================================
+% A: mean FC of large-scale networks
+% =========================================================================
+for type_ind = 1:length(types)
+    if type_ind==1
+        image_to_plot = human_female;
+        network_names = Yeo_names;
+    elseif type_ind==2
+        image_to_plot = macaque;
+        network_names = macaque_network_names;
+    end
+    bw = image_to_plot>0;
     
+    ax1 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.07)*(type_ind-1)+0.03 ax0_position(2) ax0_position(3) ax0_position(4)]);
+    bar([data_Figure5.empirical_stats.meanFC{type_ind}.RSN, 0, data_Figure5.empirical_stats.meanFC{type_ind}.global], 'FaceColor', cmap(type_ind,:))
+    set(ax1, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
+        'xtick', [1:length(data_Figure5.empirical_stats.meanFC{type_ind}.RSN), length(data_Figure5.empirical_stats.meanFC{type_ind}.RSN)+2], ...
+        'xticklabel', {network_names{:}, '{\bfwhole brain}'}, ...
+        'xticklabelrotation', 45, 'ylim', [0 1])
+    if type_ind==1
+        ylabel('$FC$', 'fontsize', fontsize_label, 'interpreter', 'latex')
+    end
+    title(titles{type_ind}, 'fontsize', fontsize_label)
+    box off
+    
+    ax1_image = axes('Position', [ax1.Position(1)+0.01 ax1.Position(2)+ax1.Position(4)*0.75 image_width image_width]);
+    imshow(bw);
+    colormap(ax1_image, flipud(gray))
+end
+
+% =========================================================================
+% B: functional path length
+% =========================================================================
+ax2 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.1)*(1-1) 0.05 ax0_position(3) ax0_position(4)*1.2]);
+data_violin = padconcatenation(data_Figure5.empirical_stats.pl{1}, data_Figure5.empirical_stats.pl{2}, 2);
+violins = utils.violinplot(data_violin, {});
+for type_ind=1:length(types)
+    violins(type_ind).MedianPlot.SizeData = 30;
+    violins(type_ind).ViolinColor = cmap(type_ind,:);
+    violins(type_ind).ViolinAlpha = 0.2;
+    violins(type_ind).ScatterPlot.SizeData = 10;
+    violins(type_ind).ScatterPlot.MarkerFaceAlpha = 1;
+    violins(type_ind).BoxColor = [0 0 0];
+    violins(type_ind).BoxWidth = 0.01;
+    violins(type_ind).WhiskerPlot.LineStyle = 'none';
+end
+set(ax2, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
+        'xticklabel', titles)
+ylabel({'regional functional'; 'path length'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
+ 
+for type_ind = 1:length(types)
+    if type_ind==1
+        image_to_plot = human_female;
+        yloc = 0.38;
+    elseif type_ind==2
+        image_to_plot = macaque;
+        yloc = 0.81;
+    end
+    bw = image_to_plot>0;
+ 
+    ax2_image = axes('Position', [ax2.Position(1)+0.01+(type_ind-1)*0.17 ax2.Position(2)+ax2.Position(4)*yloc image_width image_width]);
+    imshow(bw);
+    colormap(ax2_image, flipud(gray))
+end
+ 
+% =========================================================================
+% C: fMRI timescale
+% =========================================================================
+ax3 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.15)*(2-1) 0.05 ax0_position(3) ax0_position(4)*1.2]);
+data_violin = padconcatenation(data_Figure5.empirical_stats.tau_BOLD{1}, data_Figure5.empirical_stats.tau_BOLD{2}, 2);
+violins = utils.violinplot(data_violin, {});
+for type_ind=1:length(types)
+    violins(type_ind).MedianPlot.SizeData = 30;
+    violins(type_ind).ViolinColor = cmap(type_ind,:);
+    violins(type_ind).ViolinAlpha = 0.2;
+    violins(type_ind).ScatterPlot.SizeData = 10;
+    violins(type_ind).ScatterPlot.MarkerFaceAlpha = 1;
+    violins(type_ind).BoxColor = [0 0 0];
+    violins(type_ind).BoxWidth = 0.01;
+    violins(type_ind).WhiskerPlot.LineStyle = 'none';
+end
+set(ax3, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
+        'xticklabel', titles)
+ylabel('fMRI signal timescale (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+ 
+for type_ind = 1:length(types)
+    if type_ind==1
+        image_to_plot = human_female;
+        yloc = 0.44;
+    elseif type_ind==2
+        image_to_plot = macaque;
+        yloc = 0.81;
+    end
+    bw = image_to_plot>0;
+ 
+    ax3_image = axes('Position', [ax3.Position(1)+0.01+(type_ind-1)*0.17 ax3.Position(2)+ax3.Position(4)*yloc image_width image_width]);
+    imshow(bw);
+    colormap(ax3_image, flipud(gray))
+end
+ 
+%%% panel letters
+annotation(fig, 'textbox', [0.08, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.04, 0.48, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.54, 0.48, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+
