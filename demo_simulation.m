@@ -4,7 +4,7 @@
 %
 % Note that this demo sweeps the time and w parameters with a short period 
 % and a coarse resolution, respectively, to reduce computational load and 
-% produce sample outputs quickly. These parameters must be changed for a 
+% produce sample outputs quickly (< 5 minutes). These parameters must be changed for a 
 % proper analysis. See WARNING notes below to see what needs to be changed.
 
 %% LOAD SOME CONNECTOME MATRICES
@@ -53,10 +53,10 @@ T_steady = (0:size(S_steady,2)-1)*param.tstep;
 % calculate some stats of S per region
 maxlag = 5;
 [acf, lags, tau] = utils.calc_timescales(S_steady, maxlag, param.tstep); % timescale
-Smean = mean(S_steady,2);                                                % mean synaptic gating
+                                              % mean synaptic gating
 
 % plot steady-state synaptic gating and firing rate time series
-figure;
+figure('Name', 'Reduced Wong-Wang model - Time series');
 subplot(1,2,1)
 plot(T_steady, S_steady)
 xlabel('time')
@@ -68,9 +68,9 @@ xlabel('time')
 ylabel('regional firing rate, H')
 
 % plot some regional stats
-figure;
+figure('Name', 'Reduced Wong-Wang model - Regional statistics');
 yyaxis left
-plot(1:param.N, Smean, '.-')
+plot(1:param.N, mean(S_steady,2), '.-')
 xlabel('region')
 ylabel('mean synaptic gating')
 
@@ -95,7 +95,7 @@ S_transition = 0.3;                              % transition value of Smean
 stats = utils.calc_response_stats(w_vec, Smean, S_transition);
 
 % plot synaptic gating tuning curve and dynamic range per region
-figure;
+figure('Name', 'Reduced Wong-Wang model - Tuning curve and dynamic range');
 subplot(1,2,1)
 plot(w_vec, Smean)
 xlabel('recurrent strength, w')
@@ -144,7 +144,7 @@ S_I_steady = sol.y_I(:,time_steady_ind:end);       % inhibitoryfiring rate
 T_steady = (0:size(S_E_steady,2)-1)*param.tstep;
 
 % plot steady-state excitatory firing rate and some stats
-figure;
+figure('Name', 'Wilson-Cowan model - Time series');
 plot(T_steady, S_E_steady)
 xlabel('time')
 ylabel('excitatory firing rate, S_E')
@@ -154,7 +154,7 @@ ylabel('excitatory firing rate, S_E')
 % =========================================================================
 
 % define vector of excitatory to excitatory connection strengths and number of trials
-wEE_vec = 1:0.05:30;        % WARNING: make sure to increase resolution for a proper analysis
+wEE_vec = 1:0.075:30;        % WARNING: make sure to increase resolution for a proper analysis
 num_trials = 1;
 
 % calculate tuning curve per region
@@ -165,7 +165,7 @@ S_transition = 0.15;                           % transition value of SEmean
 stats = utils.calc_response_stats(wEE_vec, SEmean, S_transition);
 
 % plot synaptic gating tuning curve and dynamic range per region
-figure;
+figure('Name', 'Wilson-Cowan model - Tuning curve and dynamic range');
 subplot(1,2,1)
 plot(wEE_vec, SEmean)
 xlabel('excitatory to excitatory connection strength, w_{EE}')
@@ -204,7 +204,7 @@ param.T = 0:param.tstep:param.tmax;
 sol = models.driftDiffusion(param);
 
 % plot decision time series
-figure;
+figure('Name', 'Drift diffusion model - Time series');
 hold on;
 plot(param.T, sol.y)
 plot(param.T, param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
