@@ -10,6 +10,7 @@ load('data/connectome_macaque.mat')
 load('data/connectome_marmoset.mat')
 load('data/region_props_chimp.mat', 'region_centroids', 'region_names') 
 load('data/RSN.mat', 'RSN_indices', 'RSN_names')
+load('data/macaque_networks.mat', 'networks_indices', 'networks_names')
 
 %% DEFINE FIGURE-RELATED PROPERTIES
 
@@ -22,6 +23,7 @@ Yeo_7net_colormap = [120, 18, 134;
                      205, 62, 78;
                      200, 200, 200]/255;
 Yeo_names = {'VIS', 'SM', 'DA', 'VA', 'LIM', 'FP', 'DM'};
+macaque_network_names = {'FRONT', 'TEMP', 'PAR', 'OCC', 'LIM'};
 
 cb = cbrewer('qual', 'Set1', 8, 'pchip');
 color_brown = cb(7,:);
@@ -304,6 +306,7 @@ for type_ind = 1:length(types)
 end
  
 set(gca, 'fontsize', fontsize_axis, 'ticklength', [0.01, 0.01], 'xticklabel', titles)
+set(gca, 'ylim', get(gca, 'ylim').*[0 1])
 ylabel({'dynamic range $\sigma$'; 'per subject'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
 [~,pval] = ttest2(DR_std{1}, DR_std{2});
 text(0.6, max(get(gca, 'ylim'))*0.9, sprintf('p = %.2g', pval), ...
@@ -481,7 +484,7 @@ cmap = [color_brown; color_green; color_brown_lighter; color_green_lighter];
 S_transition = 0.3;
 stats_to_plot = 'dynamic_range';
 stats_to_plot_name = 'dynamic range';
-image_width = 0.07;
+image_width = 0.06;
 
 fig = figure('Position', [200 200 800 500]);
 % =========================================================================
@@ -526,7 +529,7 @@ for type_ind = 1:length(types)
     end
     title(titles{type_ind}, 'fontsize', fontsize_label)
     
-    ax1_image= axes('Position', [ax1.Position(1)-0.01 ax1.Position(2)+ax1.Position(4)*0.75 image_width image_width]);
+    ax1_image= axes('Position', [ax1.Position(1)-0.01 ax1.Position(2)+ax1.Position(4)*0.78 image_width image_width]);
     imshow(bw);
     colormap(ax1_image, flipud(gray))
 end
@@ -550,7 +553,7 @@ for type_ind = 1:length(types)
     violins(type_ind).ScatterPlot.SizeData = 10;
     violins(type_ind).ScatterPlot.MarkerFaceAlpha = 1;
     violins(type_ind).BoxColor = [0 0 0];
-    violins(type_ind).BoxWidth = 0.05;
+    violins(type_ind).BoxWidth = 0.03;
     violins(type_ind).WhiskerPlot.LineStyle = 'none';
     text(type_ind, 1.3, titles{type_ind}, 'color', cmap(type_ind,:), ...
     'fontsize', fontsize_axis, 'fontweight', 'b', 'verticalalignment', 'bottom')
@@ -575,7 +578,7 @@ for type_ind = 1:length(types)
     end
     bw = image_to_plot>0;
     
-    ax2_image= axes('Position', [ax2.Position(1)+ax2.Position(3)*0.78 ax2.Position(2)+ax2.Position(4)*0.8-0.088*(type_ind-1) image_width image_width]);
+    ax2_image= axes('Position', [ax2.Position(1)+ax2.Position(3)*0.79 ax2.Position(2)+ax2.Position(4)*0.8-0.088*(type_ind-1) image_width image_width]);
     imshow(bw);
     colormap(ax2_image, flipud(gray))
 end
@@ -1237,11 +1240,9 @@ end
 %%% panel letters
 annotation(fig, 'textbox', [0.07, 0.99, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.38, 0.99, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.07, 0.67, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.07, 0.67, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
-        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.07, 0.35, 0.01, 0.01], 'string', 'D', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.07, 0.35, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
 %% SUPPLEMENTARY FIGURE 9
@@ -1666,12 +1667,117 @@ annotation('arrow', [ax1_left.Position(1)+ax1_left.Position(3)+0.02 ax1_right.Po
 % load all data relevant to Supplementary Figure 14
 data_SuppFigure14 = load(sprintf('%s/SuppFigure14.mat', data_foldername));
 
+types = {'human', 'chimp', 'macaque', 'marmoset'};
+titles = {'human', 'chimpanzee', 'macaque', 'marmoset'};
+
+cmap = [color_brown; color_green; color_blue; color_purple];
+
+w_interest_list = [0.45, 0.45, 0.32, 0.45];
+w_interest_ind = dsearchn(data_SuppFigure14.tuningcurve.w', w_interest_list');
+ 
+image_width = 0.06;
+ 
+fig = figure('Position', [200 200 600 600]);
+ 
+ax0 = axes('Position', [0.13 0.6 0.35 0.3]);
+ax0_position = ax0.Position;
+set(ax0,'visible','off')
+
+for type_ind=[3,4]
+    if type_ind==1
+        image_to_plot = human_female;
+    elseif type_ind==2
+        image_to_plot = chimpanzee;
+    elseif type_ind==3
+        image_to_plot = macaque;
+    elseif type_ind==4
+        image_to_plot = marmoset;
+    end
+    bw = image_to_plot>0;
+    
+    % =========================================================================
+    % A: correlation of timescales and dynamic range
+    % =========================================================================
+    ax1 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.1)*(type_ind-1-2) ax0_position(2) ax0_position(3) ax0_position(4)]);
+    data_to_plot_x = tiedrank(zscore(data_SuppFigure14.tuningcurve.stats{type_ind}.dynamic_range));
+    data_to_plot_y = tiedrank(data_SuppFigure14.tuningcurve.stats{type_ind}.tau_neural(:,w_interest_ind(type_ind)));
+    hold on;
+    plot(data_to_plot_x, data_to_plot_y, '.', 'color', cmap(type_ind,:), 'markersize', 20)
+    plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
+        'k-', 'linewidth', 2);
+    hold off;
+    set(ax1, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'box', 'off', 'xlim', [1 10*ceil(length(data_to_plot_x)/10)], 'ylim', [1 10*ceil(length(data_to_plot_x)/10)])
+    xlabel('rank of dynamic range', 'fontsize', fontsize_label, 'interpreter', 'latex')
+    if type_ind==1+2
+        ylabel('rank of timescale', 'fontsize', fontsize_label, 'interpreter', 'latex')
+    end
+    [rho,pval] = corr(data_to_plot_x, data_to_plot_y, 'type', 'pearson');
+    if type_ind==3
+        text(max(get(ax1,'xlim'))+8, max(get(ax1,'ylim'))*0.38, sprintf('r = %.2g', rho), ...
+            'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+        text(max(get(ax1,'xlim'))+8, max(get(ax1,'ylim'))*0.30, sprintf('p = %.2g', pval), ...
+            'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+    else
+        text(max(get(ax1,'xlim'))+8, max(get(ax1,'ylim'))*0.26, sprintf('r = %.2g', rho), ...
+            'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+        text(max(get(ax1,'xlim'))+8, max(get(ax1,'ylim'))*0.19, sprintf('p = %.2g', pval), ...
+            'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+    end
+
+    title(titles{type_ind}, 'fontsize', fontsize_label)
+    
+    ax1_image = axes('Position', [ax1.Position(1)+0.01 ax1.Position(2)+ax1.Position(4)*0.8 image_width image_width]);
+    imshow(bw);
+    colormap(ax1_image, flipud(gray))
+
+    % =========================================================================
+    % B: human - macaque/marmoset whole-brain accuracy
+    % =========================================================================
+    ax2 = axes('Position', [ax1.Position(1) 0.1 ax0_position(3) ax0_position(4)]);
+    data_to_plot_x = data_SuppFigure14.decision.time;
+    data_to_plot_y = mean(data_SuppFigure14.decision.accuracy{1},1)-mean(data_SuppFigure14.decision.accuracy{type_ind},1);
+    [~, min_diff_ind] = min(data_to_plot_y);
+    hold on;
+    plot(data_to_plot_x, data_to_plot_y, 'k-', 'linewidth', 2)
+    plot(data_to_plot_x, 0*(ones(size(data_to_plot_x))), 'k:');
+    hold off;
+
+    set(ax2, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 1.5], 'ylim', [-8, 12])
+    hold on;
+    plot(data_to_plot_x(min_diff_ind)*ones(1,2), get(gca,'ylim'), 'k--');
+    hold off;
+    xlabel('time (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+    text(data_to_plot_x(min_diff_ind), min(get(gca,'ylim')), '$t_{\rm min}$', 'interpreter', 'latex', ...
+         'horizontalalignment', 'center', 'verticalalignment', 'top', 'fontsize', fontsize_label)
+    if type_ind==3
+        ylabel({'difference in'; 'whole-brain accuracy ($\%$)'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
+    end
+    title(sprintf('%s – %s', titles{1}, titles{type_ind}), 'fontsize', fontsize_label)
+end
+
+%%% titles
+annotation(fig, 'textbox', [0.1, 0.96, 0.8, 0.01], 'string', 'neural timescales', 'edgecolor', 'none', ...
+        'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center', 'verticalalignment', 'middle')
+annotation(fig, 'textbox', [0.1, 0.47, 0.8, 0.01], 'string', 'computational capacity', 'edgecolor', 'none', ...
+        'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center', 'verticalalignment', 'middle')
+      
+%%% panel letters
+annotation(fig, 'textbox', [0.03, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.03, 0.49, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+    
+%% SUPPLEMENTARY FIGURE 15
+
+% load all data relevant to Supplementary Figure 15
+data_SuppFigure15 = load(sprintf('%s/SuppFigure15.mat', data_foldername));
+
 nodeLocations = region_centroids;
 markersize = 50;
 
 FN = 7;
-data_to_plot_x = data_SuppFigure14.decision.time;
-data_to_plot_y = mean(data_SuppFigure14.decision.accuracy{1}(RSN_indices==FN,:),1)-mean(data_SuppFigure14.decision.accuracy{2}(RSN_indices==FN,:),1);
+data_to_plot_x = data_SuppFigure15.decision.time;
+data_to_plot_y = mean(data_SuppFigure15.decision.accuracy{1}(RSN_indices==FN,:),1)-mean(data_SuppFigure15.decision.accuracy{2}(RSN_indices==FN,:),1);
 
 fig = figure;
 % =========================================================================
