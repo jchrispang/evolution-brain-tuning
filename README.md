@@ -19,11 +19,12 @@ Download the repository and add to your Matlab path
 
 ## Dependencies
 
-Some important aspects you need to do before running generate_paper_figures.m
+Some important aspects you need to do before running generate_paper_X.m
 
 1. Download [cbrewer](https://au.mathworks.com/matlabcentral/fileexchange/34087-cbrewer-colorbrewer-schemes-for-matlab) and add to Matlab path.
-
 2. Download the latest version (2019) of the [Brain Connectivity Toolbox](https://sites.google.com/site/bctnet/) and add to Matlab path.
+3. Download the gifti [library](https://github.com/gllmflndn/gifti) and add to Matlab path.
+4. Download Stuart Oldham's [repository](https://github.com/StuartJO/plotSurfaceROIBoundary) for drawing ROI boundaries on a surface and add to Matlab path. 
 
 ## Compatibility
 
@@ -37,7 +38,7 @@ Note that the configuration of your computer (e.g., screen resolution) affects h
 
 If you use our code in your research, please cite us as follows:
 
-J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary shaping of human brain dynamics, (2021) (DOI: XXX)
+J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary shaping of human brain dynamics, (2022) (DOI: XXX)
 
 ## Further details
 
