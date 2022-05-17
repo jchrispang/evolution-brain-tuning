@@ -1117,11 +1117,13 @@ annotation(fig, 'textbox', [0.09, 0.47, 0.01, 0.01], 'string', 'B', 'edgecolor',
 
 % load all data relevant to Figure 6
 data_Figure6 = load(sprintf('%s/Figure6.mat', data_foldername));
-%%
+
 types = {'human', 'macaque'};
 titles = {'human', 'macaque'};
 
 cmap = [color_brown; color_blue];
+
+pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure6'));
 
 image_width = 0.06;
  
@@ -1182,7 +1184,15 @@ end
 set(ax2, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
         'xticklabel', titles)
 ylabel({'regional functional'; 'path length'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
- 
+[~,pval] = ttest2(data_Figure6.empirical_stats.pl{1}, data_Figure6.empirical_stats.pl{2});
+if ~show_padj
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, extract_pvalue_text(pval), ...
+                'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'middle', 'horizontalalignment', 'right');
+else
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, extract_pvalue_text(pvals_adj(pvals_adj_ind(2)), 1), ...
+                'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'middle', 'horizontalalignment', 'right');
+end
+
 for type_ind = 1:length(types)
     if type_ind==1
         image_to_plot = human_female;
@@ -1217,7 +1227,15 @@ end
 set(ax3, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
         'xticklabel', titles)
 ylabel('fMRI signal timescale (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
- 
+[~,pval] = ttest2(data_Figure6.empirical_stats.tau_BOLD{1}, data_Figure6.empirical_stats.tau_BOLD{2});
+if ~show_padj
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, extract_pvalue_text(pval), ...
+                'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'middle', 'horizontalalignment', 'right');
+else
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, extract_pvalue_text(pvals_adj(pvals_adj_ind(3)), 1), ...
+                'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'middle', 'horizontalalignment', 'right');
+end
+
 for type_ind = 1:length(types)
     if type_ind==1
         image_to_plot = human_female;
