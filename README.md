@@ -34,11 +34,11 @@ The codes have been tested on versions of MATLAB from R2017a to R2020b.
 
 Note that the configuration of your computer (e.g., screen resolution) affects how the figures created by running generate_paper_figures.m and generate_paper_suppfigures.m will look. Hence, they will not 100% visually match the figures in the paper, but the scientific contents are replicated.
 
-## Citation (TO BE UPDATED)
+## Citation
 
 If you use our code in your research, please cite us as follows:
 
-J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary shaping of human brain dynamics, (2022) (DOI: XXX)
+J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary shaping of human brain dynamics, bioRxiv (2022) (DOI: [10.1101/2022.06.07.495189](https://www.biorxiv.org/content/10.1101/2022.06.07.495189v1))
 
 ## Further details
 
