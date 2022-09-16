@@ -1992,8 +1992,10 @@ data_SuppFigure16 = load(sprintf('%s/SuppFigure16.mat', data_foldername));
 N = 114;
 types = {'human', 'chimp'};
 
-lambda_interest = [0, 20, -20];
 colors = {'k', 'r', 'b'};
+
+node_interests_colors = brighten(lines(6),0.3);
+node_interests_colors = node_interests_colors([4,6],:);
 
 fig = figure('Position', [200 200 800 600]);
 
@@ -2045,9 +2047,9 @@ type_ind = 1;
 ax2 = axes('Position', [ax1.Position(1)+ax1.Position(3)*1.17 ax1.Position(2)+0.05 ax1.Position(3)*0.85 ax1.Position(4)*0.8]);
 data_to_plot_x = 1:N;
 hold on;
-for ii=1:length(lambda_interest)
-    lambda_ind = dsearchn(data_SuppFigure16.decision.lambda_vec', lambda_interest(ii));
-    data_to_plot_y = squeeze(data_SuppFigure16.decision.reaction_time{type_ind}(:,:,lambda_ind));
+for ii=1:length(data_SuppFigure16.decision.lambda_interest)
+    data_to_plot_y = data_SuppFigure16.decision.reaction_time_lambda_interest{type_ind}(:,ii);
+    
     plot(data_to_plot_x, mean(data_to_plot_y, 2), '.-', 'color', colors{ii}, 'markersize', 12, 'linewidth', 1)           
 end
 hold off;
@@ -2065,9 +2067,8 @@ ax3 = axes('Position', [ax2.Position(1)+ax2.Position(3)*1.43 ax2.Position(2) ax2
 node = 84;
 data_to_plot_x = data_SuppFigure16.decision.time;
 hold on;
-for ii=1:length(lambda_interest)
-    lambda_ind = dsearchn(data_SuppFigure16.decision.lambda_vec', lambda_interest(ii));
-    data_to_plot_y = squeeze(data_SuppFigure16.decision.accuracy{type_ind}(node,:,lambda_ind));
+for ii=1:length(data_SuppFigure16.decision.lambda_interest)
+    data_to_plot_y = data_SuppFigure16.decision.region_accuracy_lambda_interest{type_ind}(:,ii);
     
     plot(data_to_plot_x, data_to_plot_y, '-', 'color', colors{ii}, 'linewidth', 2)           
 end
@@ -2081,13 +2082,11 @@ ylabel('regional accuracy ($\%$)', 'fontsize', fontsize_label, 'interpreter', 'l
 %%% D: human - chimp whole-brain accuracy for some lambda
 ax4 = axes('Position', [0.1 0.1 ax2.Position(3)*1.45 ax2.Position(4)]);
 data_to_plot_x = data_SuppFigure16.decision.time;
-data_to_plot_y_1 = squeeze(mean(data_SuppFigure16.decision.accuracy{1},1));
-data_to_plot_y_2 = squeeze(mean(data_SuppFigure16.decision.accuracy{2},1));
-[~, min_diff_ind] = min(data_to_plot_y_1(:,dsearchn(data_SuppFigure16.decision.lambda_vec', 0)) - data_to_plot_y_2(:,dsearchn(data_SuppFigure16.decision.lambda_vec', 0)));
 hold on;
-for ii=1:length(lambda_interest)
+for ii=1:length(data_SuppFigure16.decision.lambda_interest)
     lambda_ind = dsearchn(data_SuppFigure16.decision.lambda_vec', lambda_interest(ii));
-    data_to_plot_y = data_to_plot_y_1(:,lambda_ind) - data_to_plot_y_2(:,lambda_ind);
+    data_to_plot_y = data_SuppFigure16.decision.mean_accuracy_lambda_interest{1}(:,ii) - ...
+                     data_SuppFigure16.decision.mean_accuracy_lambda_interest{2}(:,ii);
     
     plot(data_to_plot_x, data_to_plot_y, '-', 'color', colors{ii}, 'linewidth', 2)           
 end
@@ -2106,10 +2105,7 @@ title('self-coupling in human and chimpanzee', 'fontsize', fontsize_axis)
 %%% E: human - chimp whole-brain accuracy at tmin
 ax5 = axes('Position', [ax4.Position(1)+ax4.Position(3)*1.38 ax4.Position(2) ax4.Position(3) ax4.Position(4)]);
 data_to_plot_x = data_SuppFigure16.decision.lambda_vec;
-data_to_plot_y_1 = squeeze(mean(data_SuppFigure16.decision.accuracy{1},1));
-data_to_plot_y_2 = squeeze(mean(data_SuppFigure16.decision.accuracy{2},1));
-[~, min_diff_ind] = min(data_to_plot_y_1(:,dsearchn(data_SuppFigure16.decision.lambda_vec', 0)) - data_to_plot_y_2(:,dsearchn(data_SuppFigure16.decision.lambda_vec', 0)));
-data_to_plot_y = data_to_plot_y_1(min_diff_ind,:) - repmat(data_to_plot_y_2(min_diff_ind,dsearchn(data_SuppFigure16.decision.lambda_vec', 0)), 1, length(data_SuppFigure16.decision.lambda_vec));
+data_to_plot_y = data_SuppFigure16.decision.accuracy_difference;
 data_to_plot_x_pos = find(data_to_plot_x>0);
 data_to_plot_x_neg = find(data_to_plot_x<0);
 hold on;
