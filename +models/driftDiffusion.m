@@ -1,10 +1,11 @@
-function sol = driftDiffusion(param, y0)
+function sol = driftDiffusion(param, y0, lambda)
 % driftDiffusion.m
 %
 % Solves the dynamic MFM model with one excitatory/inhibitory population
 %
 % Inputs: param : parameters of the model
 %         y0    : initial conditions [Nx1]
+%         lambda : self-coupling (float)
 %
 % Output: sol   : output (struct)
 %                 fields: x, y
@@ -15,10 +16,13 @@ function sol = driftDiffusion(param, y0)
 % \dot{y} = beta_i + sigma*v_i(t)
 %
 % Original: James Pang, QIMR Berghofer, 2020
-% Revised:  James Pang, Monash University, 2021
+% Revised:  James Pang, Monash University, 2022
 
 %%
 
+if nargin<3
+    lambda = 0;
+end
 if nargin<2
     y0 = zeros(param.N,1);
 end
@@ -40,7 +44,7 @@ dW = sqrt(param.tstep)*randn(param.N,length(param.T));
 sol.y(:,1) = y0;
 
 for k = 2:length(param.T)
-    dy = param.beta.*ones(param.N,1) - W_L*sol.y(:,k-1);
+    dy = param.beta.*ones(param.N,1) + lambda*sol.y(:,k-1) - W_L*sol.y(:,k-1);
     sol.y(:,k) = sol.y(:,k-1) + dy*param.tstep + w_coef*dW(:,k);
     
     if sum(sol.y(:,k-1)>=param.thres) > 0

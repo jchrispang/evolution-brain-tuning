@@ -1,6 +1,11 @@
 % generate_paper_figures.m
 % 
 % Matlab code to generate the main figures of the paper
+%
+% Note that the configuration of your computer (e.g., screen resolution)
+% affects how the figures created will look. Hence, they will not 100% 
+% visually match the figures in the paper, but the scientific contents 
+% are replicated.
 
 %% LOAD CONNECTOME MATRICES, REGION LOCATIONS/NAMES, CORTICAL SURFACES, PARCELLATION, MULTIPLE COMPARISONS P-VALUE
 
@@ -8,10 +13,14 @@ load('data/connectome_human.mat')
 load('data/connectome_chimp.mat')
 load('data/connectome_macaque.mat')
 load('data/connectome_marmoset.mat')
+load('data/connectome_human_specific.mat')
+load('data/connectome_chimp_specific.mat')
+load('data/connectome_human_chimp_shared.mat')
 load('data/region_props_chimp.mat', 'region_centroids', 'region_names') 
 load('data/RSN.mat', 'RSN_indices', 'RSN_names')
 load('data/macaque_networks.mat', 'networks_indices', 'networks_names')
 load('data/data_figures/multiple_comparisons.mat', 'multiple_comparisons', 'pvals_adj')
+load('data/data_figures/bct_stats.mat', 'bct_stats')
 
 human_surface = @(wb_hemi, surface_interest) sprintf('data/S1200.%s.%s_MSMAll.32k_fs_LR.surf.gii', wb_hemi, surface_interest);
 chimp_surface = @(wb_hemi, surface_interest) sprintf('data/ChimpYerkes29_v1.2.%s.%s.32k_fs_LR.surf.gii', wb_hemi, surface_interest);
@@ -67,8 +76,415 @@ data_foldername = 'data/data_figures';
 
 %% FIGURE 1
 
-% load all data relevant to Figure 1
-data_Figure1 = load(sprintf('%s/Figure1.mat', data_foldername));
+types = {'human', 'chimp'};
+titles = {'human', 'chimpanzee'};
+
+cmap = [color_brown; color_green];
+
+parc_lh = dlmread(parc_filename('lh'));
+parcels_lh = unique(parc_lh(parc_lh>0));
+num_parcels_lh = length(parcels_lh);
+parc_rh = dlmread(parc_filename('rh'));
+parcels_rh = unique(parc_rh(parc_rh>0));
+num_parcels_rh = length(parcels_rh);
+
+N = 114;
+normalization = 'maximum';
+slice = 'axial';
+markersize = 80;
+node_cmap = [1, 1, 1];
+node_cval = ones(N,1);
+nodeLocations = region_centroids;
+nodeSizes = (markersize/10)*ones(N,1);
+edge_width = 1;
+
+pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure1'));
+
+image_width = 0.04;
+
+fig = figure('Position', [200 200 800 800]);
+
+ax0 = axes('Position', [0.05 0.71 0.45 0.3]);
+ax0_position = ax0.Position;
+set(ax0,'visible','off')
+
+% =========================================================================
+% A-B: parcellation and connectome matrices
+% =========================================================================
+length_x = ax0_position(3);
+length_y = ax0_position(4);
+
+for type_ind=1:length(types)
+    type = types{type_ind};
+    if type_ind==1
+        image_to_plot = human_female;
+    elseif type_ind==2
+        image_to_plot = chimpanzee;
+    end
+    bw = image_to_plot>0;
+    
+    W = utils.norm_matrix(eval(sprintf('connectome_%s', type)));
+    
+    surface_to_plot_lh = gifti(surface_file{type_ind}.lh);
+    surface_to_plot_rh = gifti(surface_file{type_ind}.rh);
+    
+    boundary_method = 'midpoint';
+    BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,double(surface_to_plot_lh.faces),parc_lh,boundary_method);
+    BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,double(surface_to_plot_rh.faces),parc_rh,boundary_method);
+
+    %%% parcellation (left lateral view)
+    parcellation_cmap = cbrewer('qual', 'Set1', num_parcels_lh+1*round(num_parcels_lh/15) , 'pchip');
+    parcellation_cmap = [0.5 0.5 0.5; parcellation_cmap((1:num_parcels_lh),:)];
+    clims = [0 max(parc_lh)];
+            
+    ax1_1 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.05)*(type_ind-1) ax0_position(2)+length_y*0.38 length_x*0.38 length_y*0.38]);
+    patch(ax1_1, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', parc_lh, ...
+               'EdgeColor', 'none', 'FaceColor', 'interp');
+    hold on;
+    for ii = 1:length(BOUNDARY_lh)
+            plot3(BOUNDARY_lh{ii}(:,1), BOUNDARY_lh{ii}(:,2), BOUNDARY_lh{ii}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+    end
+    hold off;
+    view([-90 0]);
+    caxis(clims)
+    material dull
+    camlight('headlight');
+    colormap(ax1_1, parcellation_cmap)
+    axis off
+    axis image
+
+    %%% parcellation (left medial view)
+    parcellation_cmap = cbrewer('qual', 'Paired', num_parcels_lh+1*round(num_parcels_lh/15) , 'pchip');
+    parcellation_cmap = [0.5 0.5 0.5; parcellation_cmap((1:num_parcels_lh),:)];
+    clims = [0 max(parc_lh)];
+    
+    ax1_2 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.05)*(type_ind-1) ax0_position(2)*0.99 ax1_1.Position(3) ax1_1.Position(4)]);
+    patch(ax1_2, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', parc_lh, ...
+               'EdgeColor', 'none', 'FaceColor', 'interp');
+    hold on;
+    for ii = 1:length(BOUNDARY_lh)
+            plot3(BOUNDARY_lh{ii}(:,1), BOUNDARY_lh{ii}(:,2), BOUNDARY_lh{ii}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+    end
+    hold off;
+    view([90 0]);
+    caxis(clims)
+    material dull
+    camlight('headlight');
+    colormap(ax1_2, parcellation_cmap)
+    axis off
+    axis image
+
+    %%% connectome matrix
+    ax1_3 = axes('Position', [ax0_position(1)+length_x*0.4+(ax0_position(3)+0.05)*(type_ind-1) ax0_position(2)*0.95 length_x*0.55 length_y]);
+    imagesc(log10(W))
+    colormap(ax1_3, flipud(hot))
+    hold on;
+    xline(57.5, 'k-', 'linewidth', 1);
+    yline(57.5, 'k-', 'linewidth', 1);
+    hold off;
+    set(ax1_3, 'fontsize', fontsize_axis, 'fontweight', 'b', 'xtick', [29, 29+57], 'xticklabel', {'LH', 'RH'}, 'ytick', [])
+%     cbar = colorbar;
+%     ylabel(cbar, '$\log_{10}$(weight)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+%     set(cbar, 'fontsize', fontsize_axis, 'ticklength', 0.01)
+%     axis off
+    axis image
+
+    ax1_image = axes('Position', [ax1_1.Position(1)-0.01-0.01*(type_ind-1) ax1_1.Position(2)+ax1_1.Position(4)*0.85 image_width image_width]);
+    imshow(bw);
+    colormap(ax1_image, flipud(gray))
+    
+    annotation('textbox', [ax1_1.Position(1)-0.03, ax1_1.Position(2)-0.055, 0.1, 0.1], 'string', 'LH', ...
+       'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
+       'verticalalignment', 'middle', 'fontweight', 'b')
+    annotation('textbox', [ax1_3.Position(1)-0.02, ax1_3.Position(2)+ax1_3.Position(4)*0.82, 0.1, 0.1], 'string', titles{type_ind}, ...
+       'fontsize', fontsize_label, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
+       'verticalalignment', 'middle', 'fontweight', 'b')
+end
+
+% =========================================================================
+% C: human-specific, chimp-specific, human-chimp shared connectomes
+% =========================================================================
+for ii=1:3
+    if ii==1
+        W = connectome_human_specific;
+        title_name = {'human-'; 'specific'};
+        edge_color = cmap(1,:);
+    elseif ii==2
+        W = connectome_chimp_specific;
+        title_name = {'chimpanzee-'; 'specific'};
+        edge_color = cmap(2,:);
+    elseif ii==3
+        W = connectome_human_chimp_shared;
+        title_name = {'shared'};
+        edge_color = 'k';
+    end
+        
+    ax2_1 = axes('Position', [ax0_position(1)-0.03+0.22*(ii-1) ax0_position(2)-0.39 0.2 ax0_position(4)]);
+
+    [edge_X, edge_Y, edge_Z] = adjacency_plot_und(threshold_proportional(W, 1), nodeLocations);  % get all the edges
+    [nodeLocations, edges] = utils.extract_scatterBrain_locs_edges(nodeLocations, edge_X, edge_Y, edge_Z, slice);
+    hold on;
+    if strcmpi(slice, 'axial')
+        scatter3(ax2_1, nodeLocations(:,1), nodeLocations(:,2), max(nodeLocations(:,3))*ones(N,1), ...
+                 nodeSizes, node_cval, 'filled', 'markeredgecolor', 'k');
+    else
+        scatter3(ax2_1, nodeLocations(:,1), nodeLocations(:,2), nodeLocations(:,3), ...
+                 nodeSizes, node_cval, 'filled', 'markeredgecolor', 'k');
+    end
+    plot3(edges(:,1), edges(:,2), edges(:,3), 'color', edge_color, 'linewidth', edge_width);
+    hold off;
+    text(0, 65, title_name, 'horizontalalignment', 'center', 'fontsize', fontsize_label, ...
+            'fontweight', 'b')
+    text(-40, -45, 'LH', 'horizontalalignment', 'center', 'fontsize', fontsize_axis, ...
+            'fontweight', 'b')
+    text(40, -45, 'RH', 'horizontalalignment', 'center', 'fontsize', fontsize_axis, ...
+        'fontweight', 'b')
+    colormap(ax2_1, node_cmap)
+    view(ax2_1, 2)
+    axis(ax2_1, 'equal')
+    set(ax2_1, 'visible', 'off')
+end
+
+% =========================================================================
+% D: human vs chimp shared weights
+% =========================================================================
+ax3 = axes('Position', [ax2_1.Position(1)+ax2_1.Position(3)*1.45 ax2_1.Position(2)+0.03 ax2_1.Position(3)*1.1 ax2_1.Position(4)]);
+triu_ind = find(triu(ones(N),1));
+W_human = utils.norm_matrix(eval(sprintf('connectome_%s', 'human')),normalization);
+W_human = W_human.*connectome_human_chimp_shared;
+W_chimp = utils.norm_matrix(eval(sprintf('connectome_%s', 'chimp')),normalization);
+W_chimp = W_chimp.*connectome_human_chimp_shared;
+data_to_plot_x = W_human(triu_ind);
+data_to_plot_y = W_chimp(triu_ind);
+hold on;
+plot(data_to_plot_x, data_to_plot_y, '.', 'color', 0.5*ones(1,3), 'markersize', 20)
+plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
+    'k-', 'linewidth', 2);
+hold off;
+[rho,pval] = corr(data_to_plot_x, data_to_plot_y, 'type', 'pearson');
+text(max(get(ax3,'xlim')), 1.05, sprintf('r = %.2f', rho), ...
+    'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+if ~show_padj
+    text(max(get(ax3,'xlim')), 0.95, utils.extract_pvalue_text(pval), ...
+        'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+else
+    text(max(get(ax3,'xlim')), 0.95, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(1)), 1, ''), ...
+    'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+end
+set(ax3, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'box', 'off', 'xlim', [0 1], 'ylim', [0 1])
+xlabel('shared (human)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+ylabel('shared (chimpanzee)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+axis square
+
+% =========================================================================
+% E: topological metrics
+% =========================================================================
+factor_x = 1.8;
+factor_y = 1.01;
+init_x = ax0_position(1)+0.05;
+init_y = 0.03;
+length_x = (ax3.Position(1)+ax3.Position(3)*0.55-init_x)/(factor_x*(2-1) + 1);
+length_y = (ax3.Position(2)-0.03-2*init_y)/(factor_y*(1-1) + 1);
+
+for ii=1:2
+    if ii==1
+        stats_to_plot = 'clustering_coeff';
+        stats_title = {'regional'; 'clustering coefficient'};
+    elseif ii==2
+        stats_to_plot = 'path_length';
+        stats_title = {'regional'; 'path length'};
+    end
+    
+    %%% violin plot
+    ax4_1 = axes('Position', [init_x+factor_x*length_x*(ii-1) init_y+factor_y*length_y*(1-1) length_x length_y]);
+    data_violin = utils.padconcatenation(bct_stats{1}.(stats_to_plot), bct_stats{2}.(stats_to_plot), 2);
+    violins = utils.violinplot(data_violin, {});
+    for type_ind_2 = 1:length(types)
+        violins(type_ind_2).MedianPlot.SizeData = 30;
+        violins(type_ind_2).ViolinColor = cmap(type_ind_2,:);
+        violins(type_ind_2).ViolinAlpha = 0.2;
+        violins(type_ind_2).ScatterPlot.SizeData = 10;
+        violins(type_ind_2).ScatterPlot.MarkerFaceAlpha = 1;
+        violins(type_ind_2).BoxColor = [0 0 0];
+        violins(type_ind_2).BoxWidth = 0.01;
+        violins(type_ind_2).WhiskerPlot.LineStyle = 'none';
+    end
+
+    set(ax4_1, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xticklabel', titles)
+    ylabel(stats_title, 'fontsize', fontsize_label, 'interpreter', 'latex')
+    
+    [~,pval] = ttest2(bct_stats{1}.(stats_to_plot), bct_stats{2}.(stats_to_plot));
+    if ~show_padj
+        text(min(get(gca, 'xlim'))*1.2, max(get(gca, 'ylim'))*1, utils.extract_pvalue_text(pval), ...
+                    'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'left');
+    else
+        text(min(get(gca, 'xlim'))*1.2, max(get(gca, 'ylim'))*1, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(1+ii)), 1, ''), ...
+                    'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'left');
+    end
+    for type_ind_2 = 1:length(types)
+        if type_ind_2==1
+            image_to_plot = human_female;
+            yloc = 0.38;
+        elseif type_ind_2==2
+            image_to_plot = chimpanzee;
+            yloc = 0.81;
+        end
+        bw = image_to_plot>0;
+
+        ax4_1_image = axes('Position', [ax4_1.Position(1)+0.01+(type_ind_2-1)*0.14 ax4_1.Position(2)+ax4_1.Position(4)*yloc image_width image_width]);
+        imshow(bw);
+        colormap(ax4_1_image, flipud(gray))
+    end
+    
+    %%% human - chimpanzee surface plot
+    factor_y_2 = 0.9;
+    init_x_2 = ax4_1.Position(1) + ax4_1.Position(3)*1.05;
+    init_y_2 = ax4_1.Position(2)*1.3;
+    length_y_2 = (ax4_1.Position(4))/(factor_y_2*(4-1) + 1);
+    length_x_2 = length_y_2*1.2;
+    
+    parc_lh = dlmread(parc_filename('lh'));
+    parcels_lh = unique(parc_lh(parc_lh>0));
+    num_parcels_lh = length(parcels_lh);
+    parc_rh = dlmread(parc_filename('rh'));
+    parcels_rh = unique(parc_rh(parc_rh>0));
+    num_parcels_rh = length(parcels_rh);
+
+    surface_to_plot_lh = gifti(surface_file{1}.lh);
+    surface_to_plot_rh = gifti(surface_file{1}.rh);
+
+    boundary_method = 'midpoint';
+    BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,double(surface_to_plot_lh.faces),parc_lh,boundary_method);
+    BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,double(surface_to_plot_rh.faces),parc_rh,boundary_method);
+
+    data_parcel = bct_stats{1}.(stats_to_plot) - bct_stats{2}.(stats_to_plot);
+
+    data_to_plot_lh = zeros(size(surface_to_plot_lh.vertices,1),1);
+    data_to_plot_rh = zeros(size(surface_to_plot_rh.vertices,1),1);
+    for jj=1:num_parcels_lh
+        parcel = parcels_lh(jj);
+
+        data_to_plot_lh(find(parc_lh==parcel)) = data_parcel(jj);
+    end
+    for jj=1:num_parcels_rh
+        parcel = parcels_rh(jj);
+
+        data_to_plot_rh(find(parc_rh==parcel)) = data_parcel(num_parcels_lh+jj);
+    end
+
+    clims = [min(data_parcel), max(data_parcel)];
+
+    ind_zeros = find(parc_lh==0);
+    data_to_plot_lh(data_to_plot_lh<clims(1)) = clims(1);
+    data_to_plot_lh(data_to_plot_lh>clims(2)) = clims(2);
+    data_to_plot_lh(ind_zeros) = clims(1)*1.1;
+    ind_zeros = find(parc_rh==0);
+    data_to_plot_rh(data_to_plot_rh<clims(1)) = clims(1);
+    data_to_plot_rh(data_to_plot_rh>clims(2)) = clims(2);
+    data_to_plot_rh(ind_zeros) = clims(1)*1.1;
+    clims(1) = clims(1)*1.1;
+    
+    %%% left lateral view
+    ax5_1 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(4-1) length_x_2 length_y_2]);
+    patch(ax5_1, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
+               'EdgeColor', 'none', 'FaceColor', 'interp');
+    hold on;
+    for jj = 1:length(BOUNDARY_lh)
+            plot3(BOUNDARY_lh{jj}(:,1), BOUNDARY_lh{jj}(:,2), BOUNDARY_lh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+    end
+    hold off;
+    view([-90 0]);
+    caxis(clims)
+    material dull
+    camlight('headlight');
+    colormap(ax5_1, [0.5 0.5 0.5; utils.bluewhitered])
+    axis off
+    axis image
+
+    %%% left medial view
+    ax5_2 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(3-1) length_x_2 length_y_2]);
+    patch(ax5_2, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
+               'EdgeColor', 'none', 'FaceColor', 'interp');
+    hold on;
+    for jj = 1:length(BOUNDARY_lh)
+            plot3(BOUNDARY_lh{jj}(:,1), BOUNDARY_lh{jj}(:,2), BOUNDARY_lh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+    end
+    hold off;
+    view([90 0]);
+    caxis(clims)
+    material dull
+    camlight('headlight');
+    colormap(ax5_2, [0.5 0.5 0.5; utils.bluewhitered])
+    axis off
+    axis image
+
+    %%% right lateral view
+    ax5_3 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(2-1) length_x_2 length_y_2]);
+    patch(ax5_3, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
+               'EdgeColor', 'none', 'FaceColor', 'interp');
+    hold on;
+    for jj = 1:length(BOUNDARY_rh)
+            plot3(BOUNDARY_rh{jj}(:,1), BOUNDARY_rh{jj}(:,2), BOUNDARY_rh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+    end
+    hold off;
+    view([90 0]);
+    caxis(clims)
+    material dull
+    camlight('headlight');
+    colormap(ax5_3, [0.5 0.5 0.5; utils.bluewhitered])
+    axis off
+    axis image
+
+    %%% right medial view
+    ax5_4 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(1-1) length_x_2 length_y_2]);
+    patch(ax5_4, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
+               'EdgeColor', 'none', 'FaceColor', 'interp');
+    hold on;
+    for jj = 1:length(BOUNDARY_rh)
+            plot3(BOUNDARY_rh{jj}(:,1), BOUNDARY_rh{jj}(:,2), BOUNDARY_rh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+    end
+    hold off;
+    view([-90 0]);
+    caxis(clims)
+    material dull
+    camlight('headlight');
+    colormap(ax5_4, [0.5 0.5 0.5; utils.bluewhitered])
+    axis off
+    axis image
+    
+    cbar = colorbar(ax5_4,'southoutside');
+    ylabel(cbar, 'h -- c', 'fontsize', fontsize_label, 'interpreter', 'latex')
+    set(cbar, 'fontsize', fontsize_axis, 'ticklength', 0.04, ...
+        'position', [ax5_4.Position(1)+ax5_4.Position(3)*0.1, ax5_4.Position(2)*0.3, ax5_4.Position(3)*0.8, 0.01], ...
+        'ytick', [])
+
+    annotation('textbox', [ax5_1.Position(1)-0.04, ax5_1.Position(2)-0.046, 0.1, 0.1], 'string', 'LH', ...
+       'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
+       'verticalalignment', 'middle', 'fontweight', 'b')
+    annotation('textbox', [ax5_1.Position(1)-0.04, ax5_3.Position(2)-0.046, 0.1, 0.1], 'string', 'RH', ...
+       'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
+       'verticalalignment', 'middle', 'fontweight', 'b')
+   
+end
+    
+%%% panel letters
+annotation(fig, 'textbox', [0.02, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.51, 0.98, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.02, 0.65, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.68, 0.65, 0.01, 0.01], 'string', 'D', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.02, 0.31, 0.01, 0.01], 'string', 'E', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')    
+annotation(fig, 'textbox', [0.54, 0.31, 0.01, 0.01], 'string', 'F', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+    
+%% FIGURE 2
+
+% load all data relevant to Figure 2
+data_Figure2 = load(sprintf('%s/Figure2.mat', data_foldername));
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
@@ -96,7 +512,9 @@ nodeLocations = region_centroids;
 nodeSizes = (markersize/10)*ones(N,1);
 nodeSizes(node_interests) = markersize;
 
-fig = figure('Position', [200 200 800 400]);
+image_width = 0.07;
+
+fig = figure('Position', [200 200 850 600]);
 % =========================================================================
 % A: connectomes
 % =========================================================================
@@ -115,7 +533,7 @@ for type_ind=1:length(types)
     end
     bw = image_to_plot>0;
 
-    ax1 = axes('Position', [-0.05+0.26*(type_ind-1) 0.45 0.44 0.44]);
+    ax1 = axes('Position', [-0.04+0.25*(type_ind-1) 0.55 0.3 0.33]);
     hold on;
     if strcmpi(slice, 'axial')
         scatter3(ax1, nodeLocations(:,1), nodeLocations(:,2), max(nodeLocations(:,3))*ones(N,1), ...
@@ -141,7 +559,7 @@ for type_ind=1:length(types)
     axis(ax1, 'equal')
     set(ax1, 'visible', 'off')
     
-    ax1_image = axes('Position', [ax1.Position(1)+0.08 ax1.Position(2)+ax1.Position(4)*0.8 0.1 0.1]);
+    ax1_image = axes('Position', [ax1.Position(1)+0.04 ax1.Position(2)+ax1.Position(4)*0.8 image_width image_width]);
     imshow(bw);
     colormap(ax1_image, flipud(gray))
 end
@@ -149,96 +567,142 @@ end
 % =========================================================================
 % B left: model schematic
 % =========================================================================
-ax2 = axes('Position', [0.03 0.07 0.3 0.3]);
+ax2 = axes('Position', [ax1.Position(1)+ax1.Position(3)*1.08 ax1.Position(2)*1.02 ax1.Position(3)*0.8 ax1.Position(4)]);
 circle_locs_x = [0.25, 0.7];
 circle_locs_y = [0.55, 0.55];
-hold on;
+hold on
 plot(circle_locs_x, circle_locs_y, 'k-', 'linewidth', 3)
-p = plot(circle_locs_x(1), circle_locs_y(1)+0.25, 'ko', 'markersize', 25, 'linewidth', 3, 'markerfacecolor', 'none');
-plot(circle_locs_x(2), circle_locs_y(2)+0.25, 'ko', 'markersize', 25, 'linewidth', 3, 'markerfacecolor', 'none')
+plot(circle_locs_x(1), circle_locs_y(1)+0.17, 'ko', 'markersize', 25, 'linewidth', 3, 'markerfacecolor', 'none')
+plot(circle_locs_x(2), circle_locs_y(2)+0.17, 'ko', 'markersize', 25, 'linewidth', 3, 'markerfacecolor', 'none')
 plot(circle_locs_x(1), circle_locs_y(1), 'ko', 'markersize', 40, 'markerfacecolor', node_interests_colors(1,:))
 plot(circle_locs_x(2), circle_locs_y(2), 'ko', 'markersize', 40, 'markerfacecolor', node_interests_colors(2,:))
 hold off;
 set(ax2, 'xtick', [], 'ytick', [], 'xlim', [0 1], 'ylim', [0 1])
 
 % annotation lines
-utils.annotation_pinned('arrow', [circle_locs_x(1)+0.043 circle_locs_x(1)+0.025], [circle_locs_y(1)*1.37 circle_locs_y(1)*1.28], ...
-    'linestyle', 'none', 'headlength', 10, 'headwidth', 12);
-utils.annotation_pinned('arrow', [circle_locs_x(2)+0.043 circle_locs_x(2)+0.025], [circle_locs_y(2)*1.37 circle_locs_y(2)*1.28], ...
-    'linestyle', 'none', 'headlength', 10, 'headwidth', 12);
-utils.annotation_pinned('arrow', [circle_locs_x(1)-0.1 circle_locs_x(1)-0.02], [circle_locs_y(1)*0.35 circle_locs_y(1)*0.72], ...
-    'linewidth', 3, 'headlength', 10, 'headwidth', 12);
-utils.annotation_pinned('arrow', [circle_locs_x(1)+0.1 circle_locs_x(1)+0.02], [circle_locs_y(1)*0.35 circle_locs_y(1)*0.72], ...
-    'linewidth', 3, 'headlength', 10, 'headwidth', 12);
-utils.annotation_pinned('arrow', [circle_locs_x(2)-0.1 circle_locs_x(2)-0.02], [circle_locs_y(2)*0.35 circle_locs_y(2)*0.72], ...
-    'linewidth', 3, 'headlength', 10, 'headwidth', 12);
-utils.annotation_pinned('arrow', [circle_locs_x(2)+0.1 circle_locs_x(2)+0.02], [circle_locs_y(2)*0.35 circle_locs_y(2)*0.72], ...
-    'linewidth', 3, 'headlength', 10, 'headwidth', 12);
+annotation('arrow', [ax2.Position(1)+ax2.Position(3)*0.322 ax2.Position(1)+ax2.Position(3)*0.318], [ax2.Position(1)+ax2.Position(4)*0.76 ax2.Position(1)+ax2.Position(4)*0.74], ...
+    'linestyle', 'none', 'headlength', 10, 'headwidth', 12)
+annotation('arrow', [ax2.Position(1)+ax2.Position(3)*0.770 ax2.Position(1)+ax2.Position(3)*0.766], [ax2.Position(1)+ax2.Position(4)*0.76 ax2.Position(1)+ax2.Position(4)*0.74], ...
+    'linestyle', 'none', 'headlength', 10, 'headwidth', 12)
+annotation('arrow', [ax2.Position(1)+ax2.Position(3)*(circle_locs_x(1)+0.10) ax2.Position(1)+ax2.Position(3)*(circle_locs_x(1)+0.04)], [ax2.Position(2)+ax2.Position(4)*0.25 ax2.Position(2)+ax2.Position(4)*0.42], ...
+    'linewidth', 3, 'headlength', 10, 'headwidth', 12)
+annotation('arrow', [ax2.Position(1)+ax2.Position(3)*(circle_locs_x(2)+0.10) ax2.Position(1)+ax2.Position(3)*(circle_locs_x(2)+0.04)], [ax2.Position(2)+ax2.Position(4)*0.25 ax2.Position(2)+ax2.Position(4)*0.42], ...
+    'linewidth', 3, 'headlength', 10, 'headwidth', 12)
+annotation('arrow', [ax2.Position(1)+ax2.Position(3)*(circle_locs_x(1)-0.10) ax2.Position(1)+ax2.Position(3)*(circle_locs_x(1)-0.04)], [ax2.Position(2)+ax2.Position(4)*0.25 ax2.Position(2)+ax2.Position(4)*0.42], ...
+    'linewidth', 3, 'headlength', 10, 'headwidth', 12)
+annotation('arrow', [ax2.Position(1)+ax2.Position(3)*(circle_locs_x(2)-0.10) ax2.Position(1)+ax2.Position(3)*(circle_locs_x(2)-0.04)], [ax2.Position(2)+ax2.Position(4)*0.25 ax2.Position(2)+ax2.Position(4)*0.42], ...
+    'linewidth', 3, 'headlength', 10, 'headwidth', 12)
 
 % texts
 text(circle_locs_x(1), circle_locs_y(1), {'region'; '$i$'}, 'horizontalalignment', 'center', 'fontsize', fontsize_label, 'interpreter', 'latex')
 text(circle_locs_x(2), circle_locs_y(2), {'region'; '$j$'}, 'horizontalalignment', 'center', 'fontsize', fontsize_label, 'interpreter', 'latex')
-text(circle_locs_x(1), circle_locs_y(1)+0.48, '$w$', 'horizontalalignment', 'center', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
-text(circle_locs_x(2), circle_locs_y(1)+0.48, '$w$', 'horizontalalignment', 'center', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(1), circle_locs_y(1)+0.32, '$w$', 'horizontalalignment', 'center', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(2), circle_locs_y(1)+0.32, '$w$', 'horizontalalignment', 'center', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
 text(mean(circle_locs_x), circle_locs_y(1), '$A_{ij}$', 'horizontalalignment', 'center', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
-text(circle_locs_x(1)+0.08, circle_locs_y(1)-0.36, '$D$', 'horizontalalignment', 'left', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
-text(circle_locs_x(2)+0.08, circle_locs_y(1)-0.36, '$D$', 'horizontalalignment', 'left', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
-text(circle_locs_x(1)-0.08, circle_locs_y(1)-0.36, '$I_0$', 'horizontalalignment', 'right', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
-text(circle_locs_x(2)-0.08, circle_locs_y(1)-0.36, '$I_0$', 'horizontalalignment', 'right', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(1)+0.08, circle_locs_y(1)-0.3, '$D$', 'horizontalalignment', 'left', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(2)+0.08, circle_locs_y(1)-0.3, '$D$', 'horizontalalignment', 'left', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(1)-0.08, circle_locs_y(1)-0.3, '$I_0$', 'horizontalalignment', 'right', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
+text(circle_locs_x(2)-0.08, circle_locs_y(1)-0.3, '$I_0$', 'horizontalalignment', 'right', 'verticalalignment', 'top', 'fontsize', fontsize_label*1.2, 'interpreter', 'latex')
 axis off
 
 % =========================================================================
 % B right: time series
 % =========================================================================
-ax3 = axes('Position', [ax2.Position(1)+ax2.Position(3)*1.15 0.15 0.14 0.2]);
+ax3 = axes('Position', [ax2.Position(1)+ax2.Position(3)*1.2 ax2.Position(2)*1.13 ax2.Position(3)*0.5 ax2.Position(4)*0.7]);
 hold on;
-plot(data_Figure1.timeseries.time, data_Figure1.timeseries.S(node_interests(1),:), 'color', node_interests_colors(1,:), 'linewidth', 1.5)
-plot(data_Figure1.timeseries.time, data_Figure1.timeseries.S(node_interests(2),:), 'color', node_interests_colors(2,:), 'linewidth', 1.5)
+plot(data_Figure2.timeseries.time, data_Figure2.timeseries.S(node_interests(1),:), 'color', node_interests_colors(1,:), 'linewidth', 1.5)
+plot(data_Figure2.timeseries.time, data_Figure2.timeseries.S(node_interests(2),:), 'color', node_interests_colors(2,:), 'linewidth', 1.5)
 hold off;
-text(max(data_Figure1.timeseries.time), mean(data_Figure1.timeseries.S(node_interests(1),:)), 'region $i$', ...
+text(max(data_Figure2.timeseries.time), mean(data_Figure2.timeseries.S(node_interests(1),:)), 'region $i$', ...
     'horizontalalignment', 'left', 'fontsize', fontsize_axis, 'interpreter', 'latex')
-text(max(data_Figure1.timeseries.time), mean(data_Figure1.timeseries.S(node_interests(2),:)), 'region $j$', ...
+text(max(data_Figure2.timeseries.time), mean(data_Figure2.timeseries.S(node_interests(2),:)), 'region $j$', ...
     'horizontalalignment', 'left', 'fontsize', fontsize_axis, 'interpreter', 'latex')
 set(ax3, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'ytick', []);
 xlabel('time (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
-ylabel({'regional synaptic'; 'gating, $S$'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
+ylabel({'regional synaptic'; 'response, $S$'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
 
 % =========================================================================
 % C: dynamic range calculation
 % =========================================================================
 node = 53;
-ax4 = axes('Position', [ax3.Position(1)+ax3.Position(3)*2.1 0.15 0.3 0.77]);
+ax4 = axes('Position', [0.09 0.07 ax1.Position(3)*1.2 ax1.Position(4)*1.15]);
 hold on;
-plot(data_Figure1.tuningcurve.w, data_Figure1.tuningcurve.S(node,:), 'k.');
-plot(data_Figure1.tuningcurve.stats.xval_10(node)*ones(1,2), [0, 1], 'k:');
-plot(data_Figure1.tuningcurve.stats.xval_90(node)*ones(1,2), [0, 1], 'k:');
-plot(data_Figure1.tuningcurve.w, data_Figure1.tuningcurve.stats.Fval_10(node)*(ones(size(data_Figure1.tuningcurve.w))), 'k:');
-plot(data_Figure1.tuningcurve.w, data_Figure1.tuningcurve.stats.Fval_90(node)*(ones(size(data_Figure1.tuningcurve.w))), 'k:');
-plot(data_Figure1.tuningcurve.stats.xval_10(node), data_Figure1.tuningcurve.stats.Fval_10(node), 'k.', 'markersize', 20)
-plot(data_Figure1.tuningcurve.stats.xval_90(node), data_Figure1.tuningcurve.stats.Fval_90(node), 'k.', 'markersize', 20)
+plot(data_Figure2.tuningcurve.w, data_Figure2.tuningcurve.S(node,:), 'k.');
+plot(data_Figure2.tuningcurve.stats.xval_10(node)*ones(1,2), [0, 1], 'k:');
+plot(data_Figure2.tuningcurve.stats.xval_90(node)*ones(1,2), [0, 1], 'k:');
+plot(data_Figure2.tuningcurve.w, data_Figure2.tuningcurve.stats.Fval_10(node)*(ones(size(data_Figure2.tuningcurve.w))), 'k:');
+plot(data_Figure2.tuningcurve.w, data_Figure2.tuningcurve.stats.Fval_90(node)*(ones(size(data_Figure2.tuningcurve.w))), 'k:');
+plot(data_Figure2.tuningcurve.stats.xval_10(node), data_Figure2.tuningcurve.stats.Fval_10(node), 'k.', 'markersize', 20)
+plot(data_Figure2.tuningcurve.stats.xval_90(node), data_Figure2.tuningcurve.stats.Fval_90(node), 'k.', 'markersize', 20)
 hold off;
-text(data_Figure1.tuningcurve.stats.xval_10(node), data_Figure1.tuningcurve.stats.Fval_10(node)-0.04, '($w_{10}$, $S_{10}$)', 'fontsize', fontsize_label, 'interpreter', 'latex')
-text(data_Figure1.tuningcurve.stats.xval_90(node), data_Figure1.tuningcurve.stats.Fval_90(node)-0.04, '($w_{90}$, $S_{90}$)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+text(data_Figure2.tuningcurve.stats.xval_10(node), data_Figure2.tuningcurve.stats.Fval_10(node)-0.04, '($w_{10}$, $\overline{S}_{10}$)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+text(data_Figure2.tuningcurve.stats.xval_90(node), data_Figure2.tuningcurve.stats.Fval_90(node)-0.04, '($w_{90}$, $\overline{S}_{90}$)', 'fontsize', fontsize_label, 'interpreter', 'latex')
 text(1.3, 0.4, {'dynamic range ='; '$10\log_{10}(w_{90}/w_{10})$'}, 'fontsize', fontsize_label, ...
      'fontweight', 'b', 'horizontalalignment', 'center', 'interpreter', 'latex')
 set(ax4, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
     'ylim', [0 1]);
 xlabel('global recurrent strength, $w$', 'fontsize', fontsize_label, 'interpreter', 'latex')
-ylabel('regional synaptic gating, $S$', 'fontsize', fontsize_label, 'interpreter', 'latex')
+ylabel({'mean regional synaptic'; 'response, $\overline{S}$'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
 
-%%% panel letters
-annotation(fig, 'textbox', [0.04, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
-        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.04, 0.42, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
-        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.61, 0.98 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
-        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+% =========================================================================
+% D: response to varying w
+% =========================================================================
+node_list = [5, 11, 74, 113];
+w_list = [0.6, 0.8];
+factor_y = 1.1;
+init_x = ax4.Position(1)+ax4.Position(3)*1.3;
+init_y = ax4.Position(2);
+length_x = (0.95 - 1.*init_x);
+length_y = (ax4.Position(2)+ax4.Position(4) - init_y)/(factor_y*(2-1) + 1);
 
+ax5_1 = axes('Position', [init_x init_y+factor_y*length_y*(2-1) length_x length_y]);
+hold on;
+plot(data_Figure2.timeseries_varyingw.time, data_Figure2.timeseries_varyingw.S(node_list(1),:), '-', 'color', 'b', 'linewidth', 1.5)
+plot(data_Figure2.timeseries_varyingw.time, data_Figure2.timeseries_varyingw.S(node_list(4),:), '-', 'color', 'r', 'linewidth', 1.5)
+annotation('rectangle', [ax5_1.Position(1) ax5_1.Position(2) ax5_1.Position(3)*0.5 ax5_1.Position(4)], ...
+           'FaceColor', 'k', 'FaceAlpha', 0.1, 'edgecolor', 'none')
+hold off;
+leg = legend('region w/ low dynamic range', 'region w/ high dynamic range', 'fontsize', fontsize_axis-2, 'location', 'southeast', 'box', 'off');
+leg.ItemTokenSize = leg.ItemTokenSize/2;
+set(leg, 'Position', get(leg, 'Position')+[0.05 0 0 0])
+set(ax5_1, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 max(data_Figure2.timeseries_varyingw.time)], ...
+    'xticklabel', {}, 'ylim', [0 0.9], 'ytick', [0 0.4 0.8]);
+
+ax5_2 = axes('Position', [init_x init_y+factor_y*length_y*(1-1) length_x length_y]);
+hold on;
+plot(data_Figure2.timeseries_varyingw.time, data_Figure2.timeseries_varyingw.S(node_list(1),:), '-', 'color', 'b', 'linewidth', 1.5)
+plot(data_Figure2.timeseries_varyingw.time, data_Figure2.timeseries_varyingw.S(node_list(2),:), '-', 'color', 'k', 'linewidth', 1.5)
+annotation('rectangle', [ax5_2.Position(1) ax5_2.Position(2) ax5_2.Position(3)*0.5 ax5_2.Position(4)], ...
+           'FaceColor', 'k', 'FaceAlpha', 0.1, 'edgecolor', 'none')
+hold off;
+leg = legend('region w/ low dynamic range', 'region w/ low dynamic range', 'fontsize', fontsize_axis-2, 'location', 'southeast', 'box', 'off');
+leg.ItemTokenSize = leg.ItemTokenSize/2;
+set(leg, 'Position', get(leg, 'Position')+[0.05 0 0 0])
+set(ax5_2, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 max(data_Figure2.timeseries_varyingw.time)], ...
+    'ylim', [0 0.9], 'ytick', [0 0.4 0.8]);
+xlabel('time (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+y_label = ylabel('regional synaptic response, $S$', 'fontsize', fontsize_label, 'interpreter', 'latex');
+set(y_label, 'Position', get(y_label, 'Position')+[0 0.5 0])
+
+annotation(fig, 'textbox', [ax5_1.Position(1), ax5_1.Position(2)+ax5_1.Position(4)*1.2, ax5_1.Position(3)*0.5, 0.01], 'string', sprintf('$w = %.1f$', w_list(1)), 'edgecolor', 'none', ...
+        'fontsize', fontsize_label, 'horizontalalignment', 'center', 'interpreter', 'latex')
+annotation(fig, 'textbox', [ax5_1.Position(1)+ax5_1.Position(3)*0.5, ax5_1.Position(2)+ax5_1.Position(4)*1.2, ax5_1.Position(3)*0.5, 0.01], 'string', sprintf('$w = %.1f$', w_list(2)), 'edgecolor', 'none', ...
+        'fontsize', fontsize_label, 'horizontalalignment', 'center', 'interpreter', 'latex')
     
-%% FIGURE 2
+%%% panel letters
+annotation(fig, 'textbox', [0.02, 0.96, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.56, 0.96 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.02, 0.52, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.49, 0.52, 0.01, 0.01], 'string', 'D', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
-% load all data relevant to Figure 2
-data_Figure2 = load(sprintf('%s/Figure2.mat', data_foldername));
+%% FIGURE 3
+
+% load all data relevant to Figure 3
+data_Figure3 = load(sprintf('%s/Figure3.mat', data_foldername));
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
@@ -256,8 +720,8 @@ parc_rh = dlmread(parc_filename('rh'));
 parcels_rh = unique(parc_rh(parc_rh>0));
 num_parcels_rh = length(parcels_rh);
 
-ylim_min = min([data_Figure2.tuningcurve.stats{1}.(stats_to_plot); data_Figure2.tuningcurve.stats{2}.(stats_to_plot)]);
-ylim_max = max([data_Figure2.tuningcurve.stats{1}.(stats_to_plot); data_Figure2.tuningcurve.stats{2}.(stats_to_plot)]);
+ylim_min = min([data_Figure3.tuningcurve.stats{1}.(stats_to_plot); data_Figure3.tuningcurve.stats{2}.(stats_to_plot)]);
+ylim_max = max([data_Figure3.tuningcurve.stats{1}.(stats_to_plot); data_Figure3.tuningcurve.stats{2}.(stats_to_plot)]);
 image_width = 0.035;
 
 fig = figure('Position', [400 100 700 1000]);
@@ -278,7 +742,7 @@ for type_ind = 1:length(types)
 
     bw = image_to_plot>0;
     
-    [~,xval_transition_ind] = sort(data_Figure2.tuningcurve.stats{type_ind}.xval_transition, 'ascend');
+    [~,xval_transition_ind] = sort(data_Figure3.tuningcurve.stats{type_ind}.xval_transition, 'ascend');
     
     % =====================================================================
     % A: tuning curve
@@ -286,14 +750,14 @@ for type_ind = 1:length(types)
     ax1 = axes('Position', [0.15+0.43*(type_ind-1) 0.84 0.35 0.13]);
     hold on;
     for ii=1:N
-        plot(data_Figure2.tuningcurve.w, data_Figure2.tuningcurve.S{type_ind}(xval_transition_ind(ii),:), 'color', gain_cmap(ii,:))
+        plot(data_Figure3.tuningcurve.w, data_Figure3.tuningcurve.S{type_ind}(xval_transition_ind(ii),:), 'color', gain_cmap(ii,:))
     end
     hold off;
     set(gca, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'ylim', [0 1], ...
                 'xtick', 0:0.5:2, 'xlim', [0 2]);
     xlabel('global recurrent strength, $w$', 'fontsize', fontsize_label, 'interpreter', 'latex')
     if type_ind==1
-        ylabel({'regional synaptic'; 'gating, $S$'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
+        ylabel({'mean regional synaptic'; 'response, $\overline{S}$'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
     end
     title(titles{type_ind}, 'fontsize', fontsize_label)
     
@@ -307,7 +771,7 @@ for type_ind = 1:length(types)
     if type_ind==1
         ax2 = axes('Position', [ax1.Position(1)+ax1.Position(3)*0.6 ax1.Position(2)-ax1.Position(4)*1.65 ax1.Position(3) ax1.Position(4)]);
 
-        data_violin = utils.padconcatenation(data_Figure2.tuningcurve.stats{1}.(stats_to_plot), data_Figure2.tuningcurve.stats{2}.(stats_to_plot), 2);
+        data_violin = utils.padconcatenation(data_Figure3.tuningcurve.stats{1}.(stats_to_plot), data_Figure3.tuningcurve.stats{2}.(stats_to_plot), 2);
         violins = utils.violinplot(data_violin, {});
         for type_ind_2 = 1:length(types)
             violins(type_ind_2).MedianPlot.SizeData = 30;
@@ -352,10 +816,10 @@ for type_ind = 1:length(types)
     surface_to_plot_rh = gifti(surface_file{type_ind}.rh);
     
     boundary_method = 'midpoint';
-    BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,surface_to_plot_lh.faces,parc_lh,boundary_method);
-    BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,surface_to_plot_rh.faces,parc_rh,boundary_method);
+    BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,double(surface_to_plot_lh.faces),parc_lh,boundary_method);
+    BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,double(surface_to_plot_rh.faces),parc_rh,boundary_method);
     
-    data_parcel = data_Figure2.tuningcurve.stats{type_ind}.(stats_to_plot);
+    data_parcel = data_Figure3.tuningcurve.stats{type_ind}.(stats_to_plot);
     
     data_to_plot_lh = zeros(size(surface_to_plot_lh.vertices,1),1);
     data_to_plot_rh = zeros(size(surface_to_plot_rh.vertices,1),1);
@@ -460,9 +924,9 @@ for type_ind = 1:length(types)
     set(cbar, 'fontsize', fontsize_axis, 'ticklength', 0.01, ...
         'position', [ax3_positions(1)+ax3_positions(3)*0.32, ax3_3.Position(2)-0.012, ax3_3.Position(3)*0.8, 0.01], ...
         'ytick', [])
-    annotation(fig, 'textbox', [cbar.Position(1)-0.05, cbar.Position(2)*1, 0.04, 0.01], 'string', 'sharp', 'edgecolor', 'none', ...
+    annotation(fig, 'textbox', [cbar.Position(1)-0.04, cbar.Position(2)*1, 0.04, 0.01], 'string', 'low', 'edgecolor', 'none', ...
                'fontsize', fontsize_axis, 'horizontalalignment', 'center', 'verticalalignment', 'middle')
-    annotation(fig, 'textbox', [cbar.Position(1)+cbar.Position(3)+0.015, cbar.Position(2)*1, 0.04, 0.01], 'string', 'diffuse', 'edgecolor', 'none', ...
+    annotation(fig, 'textbox', [cbar.Position(1)+cbar.Position(3)+0.005, cbar.Position(2)*1, 0.04, 0.01], 'string', 'high', 'edgecolor', 'none', ...
                'fontsize', fontsize_axis, 'horizontalalignment', 'center', 'verticalalignment', 'middle')    
    
     annotation('textbox', [ax3_1.Position(1)-0.04, ax3_1.Position(2)+0.038, 0.1, 0.1], 'string', 'LH', ...
@@ -478,7 +942,7 @@ for type_ind = 1:length(types)
     ax4 = axes('Position', [ax1.Position(1) ax3.Position(2)-ax3.Position(4)*1.65 ax1.Position(3) ax1.Position(4)]);
     data_violin = [];
     for FN = 1:7
-        data_violin = cat(2, data_violin, data_Figure2.tuningcurve.stats{type_ind}.FN(:,FN));
+        data_violin = cat(2, data_violin, data_Figure3.tuningcurve.stats{type_ind}.FN(:,FN));
     end
 
     violins = utils.violinplot(data_violin, {});
@@ -507,9 +971,9 @@ for type_ind = 1:length(types)
     ax5 = axes('Position', [ax1.Position(1) ax4.Position(2)-ax4.Position(4)*1.35 ax1.Position(3) ax1.Position(4)]);
     hold on;
     for FN=1:7
-        plot(data_Figure2.tuningcurve.w, squeeze(data_Figure2.between_FC{type_ind}(FN,FN,:)), '-', 'color', Yeo_7net_colormap(FN,:), 'linewidth', 1)
+        plot(data_Figure3.tuningcurve.w, squeeze(data_Figure3.between_FC{type_ind}(FN,FN,:)), '-', 'color', Yeo_7net_colormap(FN,:), 'linewidth', 1)
     end
-    plot(data_Figure2.tuningcurve.w, data_Figure2.global_FC{type_ind}, 'k-', 'linewidth', 2)
+    plot(data_Figure3.tuningcurve.w, data_Figure3.global_FC{type_ind}, 'k-', 'linewidth', 2)
     hold off;
     if type_ind==2
         leg = legend([Yeo_names, 'whole brain'], 'fontsize', fontsize_axis-2, 'location', 'northeast', 'box', 'off');
@@ -533,16 +997,70 @@ annotation(fig, 'textbox', [0.3, 0.77, 0.01, 0.01], 'string', 'B', 'edgecolor', 
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 annotation(fig, 'textbox', [0.09, 0.58, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.09, 0.39, 0.01, 0.01], 'string', 'D', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.09, 0.37, 0.01, 0.01], 'string', 'D', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
-annotation(fig, 'textbox', [0.09, 0.20, 0.01, 0.01], 'string', 'E', 'edgecolor', 'none', ...
-        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.09, 0.19, 0.01, 0.01], 'string', 'E', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')    
     
-    
-%% FIGURE 3
+%% FIGURE 4
 
-% load all data relevant to Figure 3
-data_Figure3 = load(sprintf('%s/Figure3.mat', data_foldername));
+% load all data relevant to Figure 4
+data_Figure4 = load(sprintf('%s/Figure4.mat', data_foldername));
+
+types = {'human', 'chimp'};
+titles = {'human', 'chimpanzee'};
+
+N = 114;
+cmap = [color_brown; color_green];
+
+pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure4'));
+
+image_width = 0.15;
+
+fig = figure('Position', [200 200 800 300]);
+for type_ind = 1:length(types)
+    type = types{type_ind};
+    
+    if type_ind==1
+        image_to_plot = human_female;
+    elseif type_ind==2
+        image_to_plot = chimpanzee;
+    end
+    bw = image_to_plot>0;
+    
+    subplot(1,2,type_ind)
+    ax1 = gca;
+    data_to_plot_x = zscore(data_Figure4.tuningcurve.stats{type_ind}.dynamic_range);
+    data_to_plot_y = data_Figure4.tuningcurve.stats{type_ind}.pl;
+    hold on;
+    plot(data_to_plot_x, data_to_plot_y, '.', 'color', cmap(type_ind,:), 'markersize', 20)
+%     plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
+%         'k-', 'linewidth', 2)
+    hold off;
+    set(ax1, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'box', 'off')
+    xlabel('dynamic range (z score)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+    ylabel('regional path length', 'fontsize', fontsize_label, 'interpreter', 'latex')
+    [rho,pval] = corr(data_to_plot_x, data_to_plot_y, 'type', 'spearman');
+    text(max(get(ax1, 'xlim')), max(get(ax1, 'ylim')), ['\rho ', sprintf('= %.2f', rho)], ...
+        'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+    if ~show_padj
+        text(max(get(ax1, 'xlim')), max(get(ax1, 'ylim'))*0.94, utils.extract_pvalue_text(pval), ...
+            'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+    else
+        text(max(get(ax1, 'xlim')), max(get(ax1, 'ylim'))*0.94, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(type_ind)), 1, ''), ...
+        'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
+    end
+    title(titles{type_ind}, 'fontsize', fontsize_label)
+           
+    ax1_image= axes('Position', [ax1.Position(1)-0.04 ax1.Position(2)+ax1.Position(4)*0.07 image_width image_width]);
+    imshow(bw);
+    colormap(ax1_image, flipud(gray))
+end
+
+%% FIGURE 5
+
+% load all data relevant to Figure 5
+data_Figure5 = load(sprintf('%s/Figure5.mat', data_foldername));
 
 types = {'human', 'chimp', 'macaque', 'marmoset'};
 titles = {'human', 'chimpanzee', 'macaque', 'marmoset'};
@@ -568,24 +1086,24 @@ for type_ind = 1:length(types)
         image_to_plot = marmoset;
     end
     bw = image_to_plot>0;
-    gain_cmap = repmat(cmap(type_ind,:),length(data_Figure3.tuningcurve.stats{type_ind}.max),1);
-%     brighten_vec = linspace(0.8,0,length(data_Figure3.tuningcurve.stats{type_ind}.max));
-    brighten_vec = zeros(length(data_Figure3.tuningcurve.stats{type_ind}.max),1);
+    gain_cmap = repmat(cmap(type_ind,:),length(data_Figure5.tuningcurve.stats{type_ind}.max),1);
+%     brighten_vec = linspace(0.8,0,length(data_Figure5.tuningcurve.stats{type_ind}.max));
+    brighten_vec = zeros(length(data_Figure5.tuningcurve.stats{type_ind}.max),1);
 
-    [~,xval_transition_ind] = sort(data_Figure3.tuningcurve.stats{type_ind}.xval_transition, 'ascend');
+    [~,xval_transition_ind] = sort(data_Figure5.tuningcurve.stats{type_ind}.xval_transition, 'ascend');
     
     subplot(2,length(types),type_ind)
     ax1 = gca;
     hold on;
-    for ii=1:length(data_Figure3.tuningcurve.stats{type_ind}.max)
-        plot(data_Figure3.tuningcurve.w, data_Figure3.tuningcurve.S{type_ind}(xval_transition_ind(ii),:), 'color', brighten(gain_cmap(ii,:),brighten_vec(ii)))
+    for ii=1:length(data_Figure5.tuningcurve.stats{type_ind}.max)
+        plot(data_Figure5.tuningcurve.w, data_Figure5.tuningcurve.S{type_ind}(xval_transition_ind(ii),:), 'color', brighten(gain_cmap(ii,:),brighten_vec(ii)))
     end
     hold off;
     set(gca, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'ylim', [0 1], ...
                 'xtick', 0:0.5:2, 'xlim', [0 2]);
     xlabel({'global recurrent'; 'strength, $w$'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
     if type_ind==1
-        ylabel({'regional synaptic'; 'gating, $S$'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
+        ylabel({'mean regional synaptic'; 'response, $\overline{S}$'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
     end
     title(titles{type_ind}, 'fontsize', fontsize_label)
     
@@ -602,7 +1120,7 @@ ax2 = gca;
 
 data_violin = [];
 for type_ind = 1:length(types)
-    data_violin = utils.padconcatenation(data_violin, data_Figure3.tuningcurve.stats{type_ind}.(stats_to_plot)-mean(data_Figure3.tuningcurve.stats{type_ind}.(stats_to_plot)), 2);
+    data_violin = utils.padconcatenation(data_violin, data_Figure5.tuningcurve.stats{type_ind}.(stats_to_plot)-mean(data_Figure5.tuningcurve.stats{type_ind}.(stats_to_plot)), 2);
 end
     
 violins = utils.violinplot(data_violin, {});
@@ -617,7 +1135,7 @@ for type_ind = 1:length(types)
     violins(type_ind).WhiskerPlot.LineStyle = 'none';
     text(type_ind-0.4, 1.3, titles{type_ind}, 'color', cmap(type_ind,:), ...
     'fontsize', fontsize_axis, 'fontweight', 'b')
-    text(type_ind, 1.3, ['(\sigma = ', sprintf('%.2f)', std(data_Figure3.tuningcurve.stats{type_ind}.(stats_to_plot)-mean(data_Figure3.tuningcurve.stats{type_ind}.(stats_to_plot))))], 'color', cmap(type_ind,:), ...
+    text(type_ind, 1.3, ['(\sigma = ', sprintf('%.2f)', std(data_Figure5.tuningcurve.stats{type_ind}.(stats_to_plot)-mean(data_Figure5.tuningcurve.stats{type_ind}.(stats_to_plot))))], 'color', cmap(type_ind,:), ...
         'fontsize', fontsize_axis, 'fontweight', 'b', 'horizontalalignment', 'left')
 end
 set(ax2, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0.5, length(types)+0.5], 'ylim', [-1.8 1.8], 'xtick', []);
@@ -644,16 +1162,15 @@ for type_ind = 1:length(types)
 end
 
 %%% panel letters
-annotation(fig, 'textbox', [0.05, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.05, 0.99, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 annotation(fig, 'textbox', [0.05, 0.5, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
+%% FIGURE 6
 
-%% FIGURE 4
-
-% load all data relevant to Figure 4
-data_Figure4 = load(sprintf('%s/Figure4.mat', data_foldername));
+% load all data relevant to Figure 6
+data_Figure6 = load(sprintf('%s/Figure6.mat', data_foldername));
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
@@ -680,9 +1197,9 @@ nodeSizes = (markersize/10)*ones(N,1);
 nodeSizes(node_interests) = markersize;
 
 w_interest = 0.45;
-w_interest_ind = dsearchn(data_Figure4.tuningcurve.w', w_interest);
+w_interest_ind = dsearchn(data_Figure6.tuningcurve.w', w_interest);
 
-pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure4'));
+pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure6'));
 
 image_width = 0.04;
 
@@ -703,8 +1220,8 @@ for type_ind = 1:length(types)
     bw = image_to_plot>0;
 
     ax1 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.08)*(type_ind-1) ax0_position(2) ax0_position(3) ax0_position(4)]);
-    data_to_plot_x = tiedrank(zscore(data_Figure4.tuningcurve.stats{type_ind}.dynamic_range));
-    data_to_plot_y = tiedrank(data_Figure4.tuningcurve.stats{type_ind}.tau_neural(:,w_interest_ind));
+    data_to_plot_x = tiedrank(zscore(data_Figure6.tuningcurve.stats{type_ind}.dynamic_range));
+    data_to_plot_y = tiedrank(data_Figure6.tuningcurve.stats{type_ind}.tau_neural(:,w_interest_ind));
     hold on;
     plot(data_to_plot_x, data_to_plot_y, '.', 'color', cmap(type_ind,:), 'markersize', 20)
     plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
@@ -722,7 +1239,7 @@ for type_ind = 1:length(types)
         text(max(get(ax1,'xlim')), 25, utils.extract_pvalue_text(pval), ...
             'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
     else
-        text(max(get(ax1,'xlim'))+5, 25, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(0+type_ind)), 1), ...
+        text(max(get(ax1,'xlim'))+5, 25, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(0+type_ind)), 1, ''), ...
             'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
     end
     title(titles{type_ind}, 'fontsize', fontsize_label)
@@ -802,8 +1319,8 @@ axis off
 % =========================================================================
 ax4 = axes('Position', [ax3.Position(1)+ax3.Position(3)*1.02 ax3.Position(2)+ax3.Position(4)*0.65 ax3.Position(3)*0.48 ax3.Position(4)*0.3]);
 hold on;
-plot(data_Figure4.timeseries.time, data_Figure4.timeseries.y(node_interests(1),:), 'color', node_interests_colors(1,:), 'linewidth', 1.5)
-plot(data_Figure4.timeseries.time, data_Figure4.timeseries.y(node_interests(2),:), 'color', node_interests_colors(2,:), 'linewidth', 1.5)
+plot(data_Figure6.timeseries.time, data_Figure6.timeseries.y(node_interests(1),:), 'color', node_interests_colors(1,:), 'linewidth', 1.5)
+plot(data_Figure6.timeseries.time, data_Figure6.timeseries.y(node_interests(2),:), 'color', node_interests_colors(2,:), 'linewidth', 1.5)
 yline(thres, 'k-', 'linewidth', 2);
 yline(-thres, 'k-', 'linewidth', 2);
 hold off;
@@ -820,8 +1337,8 @@ ylabel({'regional'; 'decision evidence'}, 'fontsize', fontsize_axis, 'interprete
 % =========================================================================
 ax5 = axes('Position', [ax4.Position(1) ax4.Position(2)-ax4.Position(4)*1.9 ax4.Position(3) ax4.Position(4)]);
 hold on;
-plot(data_Figure4.timeseries.time, data_Figure4.timeseries.accuracy(node_interests(1),:), 'color', node_interests_colors(1,:), 'linewidth', 1.5)
-plot(data_Figure4.timeseries.time, data_Figure4.timeseries.accuracy(node_interests(2),:), 'color', node_interests_colors(2,:), 'linewidth', 1.5)
+plot(data_Figure6.timeseries.time, data_Figure6.timeseries.accuracy(node_interests(1),:), 'color', node_interests_colors(1,:), 'linewidth', 1.5)
+plot(data_Figure6.timeseries.time, data_Figure6.timeseries.accuracy(node_interests(2),:), 'color', node_interests_colors(2,:), 'linewidth', 1.5)
 hold off;
 set(ax5, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 1.5]);
 xlabel('time (s)', 'fontsize', fontsize_axis, 'interpreter', 'latex')
@@ -831,8 +1348,8 @@ ylabel({'regional'; 'accuracy ($\%$)'}, 'fontsize', fontsize_axis, 'interpreter'
 % E: human - chimpanzee whole-brain accuracy
 % =========================================================================
 ax6 = axes('Position', [ax0_position(1) 0.05 ax0_position(3) ax0_position(4)]);
-data_to_plot_x = data_Figure4.decision.time;
-data_to_plot_y = mean(data_Figure4.decision.accuracy{1},1)-mean(data_Figure4.decision.accuracy{2},1);
+data_to_plot_x = data_Figure6.decision.time;
+data_to_plot_y = mean(data_Figure6.decision.accuracy{1},1)-mean(data_Figure6.decision.accuracy{2},1);
 [~, min_diff_ind] = min(data_to_plot_y);
 hold on;
 plot(data_to_plot_x, data_to_plot_y, 'k-', 'linewidth', 2)
@@ -859,8 +1376,8 @@ for type_ind=1:length(types)
     bw = image_to_plot>0;
     
     ax7 = axes('Position', [ax6.Position(1)+ax6.Position(3)+0.12 yloc ax6.Position(3)*0.9 ax6.Position(4)*0.4]);
-    data_to_plot_x = zscore(data_Figure4.tuningcurve.stats{type_ind}.dynamic_range);
-    data_to_plot_y = squeeze(data_Figure4.decision.accuracy{type_ind}(:,min_diff_ind));
+    data_to_plot_x = zscore(data_Figure6.tuningcurve.stats{type_ind}.dynamic_range);
+    data_to_plot_y = squeeze(data_Figure6.decision.accuracy{type_ind}(:,min_diff_ind));
     hold on;
     plot(data_to_plot_x, data_to_plot_y, '.', 'color', cmap(type_ind,:), 'markersize', 12)
     plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
@@ -880,7 +1397,7 @@ for type_ind=1:length(types)
         text(max(get(ax7, 'xlim'))*0.99, max(get(ax7, 'ylim'))*0.75, utils.extract_pvalue_text(pval), ...
             'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'bottom', 'horizontalalignment', 'right');
     else
-        text(max(get(ax7, 'xlim'))*0.99, max(get(ax7, 'ylim'))*0.71, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(2+type_ind)), 1), ...
+        text(max(get(ax7, 'xlim'))*0.99, max(get(ax7, 'ylim'))*0.75, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(2+type_ind)), 1, ''), ...
             'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'bottom', 'horizontalalignment', 'right');
     end
  
@@ -892,7 +1409,7 @@ end
 %%% titles
 annotation(fig, 'textbox', [0.1, 0.985, 0.8, 0.01], 'string', 'neural timescales', 'edgecolor', 'none', ...
         'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center', 'verticalalignment', 'middle')
-annotation(fig, 'textbox', [0.1, 0.62, 0.8, 0.01], 'string', 'computational capacity', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.1, 0.62, 0.8, 0.01], 'string', 'decision making', 'edgecolor', 'none', ...
         'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center', 'verticalalignment', 'middle')
     
 %%% panel letters
@@ -909,10 +1426,10 @@ annotation(fig, 'textbox', [0.03, 0.31, 0.01, 0.01], 'string', 'E', 'edgecolor',
 annotation(fig, 'textbox', [0.54, 0.31, 0.01, 0.01], 'string', 'F', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
-%% FIGURE 5
+%% FIGURE 7
 
-% load all data relevant to Figure 5
-data_Figure5 = load(sprintf('%s/Figure5.mat', data_foldername));
+% load all data relevant to Figure 7
+data_Figure7 = load(sprintf('%s/Figure7.mat', data_foldername));
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
@@ -926,7 +1443,7 @@ parc_rh = dlmread(parc_filename('rh'));
 parcels_rh = unique(parc_rh(parc_rh>0));
 num_parcels_rh = length(parcels_rh);
 
-pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure5'));
+pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure7'));
 
 image_width = 0.06;
 
@@ -952,10 +1469,10 @@ for type_ind = 1:length(types)
     surface_to_plot_rh = gifti(surface_file{type_ind}.rh);
     
     boundary_method = 'midpoint';
-    BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,surface_to_plot_lh.faces,parc_lh,boundary_method);
-    BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,surface_to_plot_rh.faces,parc_rh,boundary_method);
+    BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,double(surface_to_plot_lh.faces),parc_lh,boundary_method);
+    BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,double(surface_to_plot_rh.faces),parc_rh,boundary_method);
     
-    data_parcel = data_Figure5.tuningcurve.stats{type_ind}.myelin;
+    data_parcel = data_Figure7.tuningcurve.stats{type_ind}.myelin;
     
     data_to_plot_lh = zeros(size(surface_to_plot_lh.vertices,1),1);
     data_to_plot_rh = zeros(size(surface_to_plot_rh.vertices,1),1);
@@ -1056,7 +1573,7 @@ for type_ind = 1:length(types)
     axis image
     
     cbar = colorbar(ax1_4,'southoutside');
-    ylabel(cbar, 'myelination', 'fontsize', fontsize_label, 'interpreter', 'latex')
+    ylabel(cbar, 'T1w:T2w', 'fontsize', fontsize_label, 'interpreter', 'latex')
     set(cbar, 'fontsize', fontsize_axis, 'ticklength', 0.01, ...
         'position', [ax1_positions(1)+ax1_positions(3)*0.32, ax1_3.Position(2)-0.15, ax1_3.Position(3)*0.8, 0.02], ...
         'ytick', [])
@@ -1079,8 +1596,8 @@ for type_ind = 1:length(types)
     % B: correlation of myelin and dynamic range
     % =========================================================================
     ax2 = axes('Position', [ax1.Position(1) ax1.Position(2)-ax1.Position(4)*1.95 ax1.Position(3) ax1.Position(4)]);
-    data_to_plot_x = zscore(data_Figure5.tuningcurve.stats{type_ind}.dynamic_range);
-    data_to_plot_y = data_Figure5.tuningcurve.stats{type_ind}.myelin;
+    data_to_plot_x = zscore(data_Figure7.tuningcurve.stats{type_ind}.dynamic_range);
+    data_to_plot_y = data_Figure7.tuningcurve.stats{type_ind}.myelin;
     hold on;
     plot(data_to_plot_x, data_to_plot_y, '.', 'color', cmap(type_ind,:), 'markersize', 20)
     plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
@@ -1089,7 +1606,7 @@ for type_ind = 1:length(types)
     set(ax2, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'box', 'off')
     xlabel('dynamic range (z score)', 'fontsize', fontsize_label, 'interpreter', 'latex')
     if type_ind==1
-        ylabel('myelination', 'fontsize', fontsize_label, 'interpreter', 'latex')
+        ylabel('T1w:T2w', 'fontsize', fontsize_label, 'interpreter', 'latex')
     end
     [rho,pval] = corr(data_to_plot_x, data_to_plot_y, 'type', 'pearson');
     text(max(get(ax2,'xlim')), max(get(ax2,'ylim'))*1, sprintf('r = %.2f', rho), ...
@@ -1098,7 +1615,7 @@ for type_ind = 1:length(types)
         text(max(get(ax2,'xlim')), max(get(ax2,'ylim'))*0.965, utils.extract_pvalue_text(pval), ...
             'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
     else
-        text(max(get(ax2,'xlim')), max(get(ax2,'ylim'))*0.965, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(type_ind)), 1), ...
+        text(max(get(ax2,'xlim')), max(get(ax2,'ylim'))*0.965, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(type_ind)), 1, ''), ...
         'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
     end
     
@@ -1113,17 +1630,17 @@ annotation(fig, 'textbox', [0.09, 0.93, 0.01, 0.01], 'string', 'A', 'edgecolor',
 annotation(fig, 'textbox', [0.09, 0.47, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
     
-%% FIGURE 6
+%% FIGURE 8
 
-% load all data relevant to Figure 6
-data_Figure6 = load(sprintf('%s/Figure6.mat', data_foldername));
+% load all data relevant to Figure 8
+data_Figure8 = load(sprintf('%s/Figure8.mat', data_foldername));
 
 types = {'human', 'macaque'};
 titles = {'human', 'macaque'};
 
 cmap = [color_brown; color_blue];
 
-pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure6'));
+pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'Figure8'));
 
 image_width = 0.06;
  
@@ -1146,12 +1663,12 @@ for type_ind = 1:length(types)
     bw = image_to_plot>0;
     
     ax1 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.07)*(type_ind-1)+0.03 ax0_position(2) ax0_position(3) ax0_position(4)]);
-    bar([data_Figure6.empirical_stats.meanFC{type_ind}.RSN, 0, data_Figure6.empirical_stats.meanFC{type_ind}.global], 'FaceColor', cmap(type_ind,:))
+    bar([data_Figure8.empirical_stats.meanFC{type_ind}.RSN, 0, data_Figure8.empirical_stats.meanFC{type_ind}.global], 'FaceColor', cmap(type_ind,:))
     hold on;
-    errorbar(1:(length(data_Figure6.empirical_stats.meanFC{type_ind}.RSN)+1+1), [data_Figure6.empirical_stats.meanFC{type_ind}.RSN, 0, data_Figure6.empirical_stats.meanFC{type_ind}.global], [data_Figure6.empirical_stats.stdFC{type_ind}.RSN, NaN, data_Figure6.empirical_stats.stdFC{type_ind}.global], 'k', 'linestyle', 'none')
+    errorbar(1:(length(data_Figure8.empirical_stats.meanFC{type_ind}.RSN)+1+1), [data_Figure8.empirical_stats.meanFC{type_ind}.RSN, 0, data_Figure8.empirical_stats.meanFC{type_ind}.global], [data_Figure8.empirical_stats.stdFC{type_ind}.RSN, NaN, data_Figure8.empirical_stats.stdFC{type_ind}.global], 'k', 'linestyle', 'none')
     hold off;
     set(ax1, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
-        'xtick', [1:length(data_Figure6.empirical_stats.meanFC{type_ind}.RSN), length(data_Figure6.empirical_stats.meanFC{type_ind}.RSN)+2], ...
+        'xtick', [1:length(data_Figure8.empirical_stats.meanFC{type_ind}.RSN), length(data_Figure8.empirical_stats.meanFC{type_ind}.RSN)+2], ...
         'xticklabel', {network_names{:}, '{\bfwhole brain}'}, ...
         'xticklabelrotation', 45, 'ylim', [0 1])
     if type_ind==1
@@ -1169,7 +1686,7 @@ end
 % B: functional path length
 % =========================================================================
 ax2 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.1)*(1-1) 0.05 ax0_position(3) ax0_position(4)*1.2]);
-data_violin = utils.padconcatenation(data_Figure6.empirical_stats.pl{1}, data_Figure6.empirical_stats.pl{2}, 2);
+data_violin = utils.padconcatenation(data_Figure8.empirical_stats.pl{1}, data_Figure8.empirical_stats.pl{2}, 2);
 violins = utils.violinplot(data_violin, {});
 for type_ind=1:length(types)
     violins(type_ind).MedianPlot.SizeData = 30;
@@ -1184,12 +1701,12 @@ end
 set(ax2, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
         'xticklabel', titles)
 ylabel({'regional functional'; 'path length'}, 'fontsize', fontsize_label, 'interpreter', 'latex')
-[~,pval] = ttest2(data_Figure6.empirical_stats.pl{1}, data_Figure6.empirical_stats.pl{2});
+[~,pval] = ttest2(data_Figure8.empirical_stats.pl{1}, data_Figure8.empirical_stats.pl{2});
 if ~show_padj
-    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, extract_pvalue_text(pval), ...
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, utils.extract_pvalue_text(pval), ...
                 'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'middle', 'horizontalalignment', 'right');
 else
-    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, extract_pvalue_text(pvals_adj(pvals_adj_ind(2)), 1), ...
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(2)), 1, ''), ...
                 'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'middle', 'horizontalalignment', 'right');
 end
 
@@ -1212,7 +1729,7 @@ end
 % C: fMRI timescale
 % =========================================================================
 ax3 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.15)*(2-1) 0.05 ax0_position(3) ax0_position(4)*1.2]);
-data_violin = utils.padconcatenation(data_Figure6.empirical_stats.tau_BOLD{1}, data_Figure6.empirical_stats.tau_BOLD{2}, 2);
+data_violin = utils.padconcatenation(data_Figure8.empirical_stats.tau_BOLD{1}, data_Figure8.empirical_stats.tau_BOLD{2}, 2);
 violins = utils.violinplot(data_violin, {});
 for type_ind=1:length(types)
     violins(type_ind).MedianPlot.SizeData = 30;
@@ -1227,12 +1744,12 @@ end
 set(ax3, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], ...
         'xticklabel', titles)
 ylabel('fMRI signal timescale (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
-[~,pval] = ttest2(data_Figure6.empirical_stats.tau_BOLD{1}, data_Figure6.empirical_stats.tau_BOLD{2});
+[~,pval] = ttest2(data_Figure8.empirical_stats.tau_BOLD{1}, data_Figure8.empirical_stats.tau_BOLD{2});
 if ~show_padj
-    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, extract_pvalue_text(pval), ...
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, utils.extract_pvalue_text(pval), ...
                 'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'middle', 'horizontalalignment', 'right');
 else
-    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, extract_pvalue_text(pvals_adj(pvals_adj_ind(3)), 1), ...
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))+[max(get(gca, 'ylim'))-min(get(gca, 'ylim'))]*0.1, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(3)), 1, ''), ...
                 'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'middle', 'horizontalalignment', 'right');
 end
 

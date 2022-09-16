@@ -9,7 +9,7 @@ end
     
 if ~is_corrected
     if pval>=0.01
-        pvalue_text = sprintf('p = %.2f', pval);
+        pvalue_text = sprintf('p = %.3f', pval);
     elseif pval<0.01 && pval>=0.001
         pvalue_text = 'p < 0.01';
     elseif pval<0.001
@@ -17,7 +17,7 @@ if ~is_corrected
     end
 else
     if pval>=0.01
-        pvalue_text = sprintf('p_{%s} = %.2f', correction_subscript, pval);
+        pvalue_text = sprintf('p_{%s} = %.3f', correction_subscript, pval);
     elseif pval<0.01 && pval>=0.001
         pvalue_text = sprintf('p_{%s} < 0.01', correction_subscript);
     elseif pval<0.001
