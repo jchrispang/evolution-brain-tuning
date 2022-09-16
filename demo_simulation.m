@@ -213,3 +213,45 @@ hold off;
 xlabel('time')
 ylabel('regional decision evidence')
 
+
+%% DEMO FOR DRIFT DIFFUSION MODEL WITH SELF-COUPLING TERM
+
+% =========================================================================
+%                          generating time series
+% =========================================================================
+
+% load predefined drift diffusion model parameters
+param = utils.loadParameters_driftDiffusion_func;
+
+% self-coupling term (lambda)
+% positive = excitation
+% negative = inhibition
+lambda = -1;
+
+% define connectome matrix A
+type = 'human';
+param.A = eval(sprintf('connectome_%s', type));  % replace with your own connectivity matrix
+param.N = size(param.A, 2);
+
+% normalize connectivity matrix with respect to maximum weight
+normalization = 'maximum';
+param.A = utils.norm_matrix(param.A, normalization);  
+
+% define simulation time 
+param.tmax = 2;         
+param.tspan = [0, param.tmax];
+param.T = 0:param.tstep:param.tmax;
+
+% simulate model using predefined initial conditions (y0 = 0)
+sol = models.driftDiffusion(param, lambda);
+
+% plot decision time series
+figure('Name', 'Drift diffusion model - Time series');
+hold on;
+plot(param.T, sol.y)
+plot(param.T, param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
+plot(param.T, -param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
+hold off;
+xlabel('time')
+ylabel('regional decision evidence')
+
