@@ -257,7 +257,7 @@ W_chimp = W_chimp.*connectome_human_chimp_shared;
 data_to_plot_x = W_human(triu_ind);
 data_to_plot_y = W_chimp(triu_ind);
 hold on;
-plot(data_to_plot_x, data_to_plot_y, '.', 'color', 0.5*ones(1,3), 'markersize', 20)
+plot(data_to_plot_x, data_to_plot_y, '.', 'color', 0.5*ones(1,3), 'markersize', 15)
 plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
     'k-', 'linewidth', 2);
 hold off;
