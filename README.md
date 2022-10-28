@@ -38,7 +38,7 @@ Note that the configuration of your computer (e.g., screen resolution) affects h
 
 If you use our code in your research, please cite us as follows:
 
-[PREPRINT] J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary shaping of human brain dynamics, eLife (2022) (DOI: [10.1101/2022.06.07.495189](https://www.biorxiv.org/content/10.1101/2022.06.07.495189v1))
+[PREPRINT] J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary shaping of human brain dynamics, bioRxiv (2022) (DOI: [10.1101/2022.06.07.495189](https://www.biorxiv.org/content/10.1101/2022.06.07.495189v1))
 
 [ARTICLE] J.C. Pang, J.K. Rilling, J.A. Roberts, M.P. van den Heuvel, L. Cocchi, Evolutionary shaping of human brain dynamics, eLife (2022) (DOI: [10.7554/eLife.80627](https://doi.org/10.7554/eLife.80627))
 
