@@ -8,7 +8,7 @@ Using computational modeling to study changes in the tuning of brain dynamics ac
 1. +models: package folder containing different brain network model functions
 2. +utils: package folder containing various utility analysis and visualization functions
 3. artworks: folder containing silhouette artworks of different species used in the paper
-4. data: folder containing source data to reproduce the main figures of the paper
+4. data: folder containing source data to reproduce the figures of the paper
 5. demo_simulation.m: code to demonstrate how to simulate different models
 6. generate_paper_figures.m: code to generate the main figures of the paper
 7. generate_paper_suppfigures.m: code to generate the supplementary figures of the paper
