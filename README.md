@@ -12,6 +12,7 @@ Using computational modeling to study changes in the tuning of brain dynamics ac
 5. demo_simulation.m: code to demonstrate how to simulate different models
 6. generate_paper_figures.m: code to generate the main figures of the paper
 7. generate_paper_suppfigures.m: code to generate the supplementary figures of the paper
+8. manuscript.pdf: pre-accepted version of the paper
 
 ## Installation
 
@@ -28,7 +29,7 @@ Some important aspects you need to do before running generate_paper_X.m
 
 ## Compatibility
 
-The codes have been tested on versions of MATLAB from R2017a to R2020b.
+The codes have been tested on versions of MATLAB from R2018b to R2020b.
 
 ## Note on running generate_paper_X.m
 
