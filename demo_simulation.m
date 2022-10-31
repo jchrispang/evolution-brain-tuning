@@ -59,25 +59,25 @@ maxlag = 5;
 figure('Name', 'Reduced Wong-Wang model - Time series');
 subplot(1,2,1)
 plot(T_steady, S_steady)
-xlabel('time')
-ylabel('regional synaptic gating, S')
+xlabel('time (s)', 'interpreter', 'latex')
+ylabel('regional synaptic response, $S$', 'interpreter', 'latex')
 
 subplot(1,2,2)
 plot(T_steady, H_steady)
-xlabel('time')
-ylabel('regional firing rate, H')
+xlabel('time (s)', 'interpreter', 'latex')
+ylabel('regional firing rate, $H$', 'interpreter', 'latex')
 
 % plot some regional stats
 figure('Name', 'Reduced Wong-Wang model - Regional statistics');
 yyaxis left
 plot(1:param.N, mean(S_steady,2), '.-')
-xlabel('region')
-ylabel('mean synaptic gating')
+xlabel('region', 'interpreter', 'latex')
+ylabel('mean regional synaptic response, $\overline{S}$', 'interpreter', 'latex')
 
 yyaxis right
 plot(1:param.N, tau, '.-')
-xlabel('region')
-ylabel('timescale, \tau')
+xlabel('region', 'interpreter', 'latex')
+ylabel('neural timescale, $\tau$', 'interpreter', 'latex')
 
 % =========================================================================
 %          calculating and analyzing synaptic gating tuning curve
@@ -98,13 +98,13 @@ stats = utils.calc_response_stats(w_vec, Smean, S_transition);
 figure('Name', 'Reduced Wong-Wang model - Tuning curve and dynamic range');
 subplot(1,2,1)
 plot(w_vec, Smean)
-xlabel('recurrent strength, w')
-ylabel('regional synaptic gating, S')
+xlabel('global recurrent strength, $w$', 'interpreter', 'latex')
+ylabel('mean regional synaptic response, $\overline{S}$', 'interpreter', 'latex')
 
 subplot(1,2,2)
 plot(1:param.N, stats.dynamic_range, 'k.-')
-xlabel('region')
-ylabel('dynamic range')
+xlabel('region', 'interpreter', 'latex')
+ylabel('dynamic range', 'interpreter', 'latex')
 
 
 %% DEMO FOR WILSON-COWAN MODEL
@@ -146,8 +146,8 @@ T_steady = (0:size(S_E_steady,2)-1)*param.tstep;
 % plot steady-state excitatory firing rate and some stats
 figure('Name', 'Wilson-Cowan model - Time series');
 plot(T_steady, S_E_steady)
-xlabel('time')
-ylabel('excitatory firing rate, S_E')
+xlabel('time (s)', 'interpreter', 'latex')
+ylabel('excitatory firing rate, $S_E$', 'interpreter', 'latex')
 
 % =========================================================================
 %       calculating and analyzing excitatory firing rate tuning curve
@@ -168,13 +168,13 @@ stats = utils.calc_response_stats(wEE_vec, SEmean, S_transition);
 figure('Name', 'Wilson-Cowan model - Tuning curve and dynamic range');
 subplot(1,2,1)
 plot(wEE_vec, SEmean)
-xlabel('excitatory to excitatory connection strength, w_{EE}')
-ylabel('regional synaptic gating, S')
+xlabel({'global excitatory'; 'recurrent strength, $w_{EE}$'}, 'interpreter', 'latex')
+ylabel({'excitatory'; 'firing rate, $S_E$'}, 'interpreter', 'latex')
 
 subplot(1,2,2)
 plot(1:param.N, stats.dynamic_range, 'k.-')
-xlabel('region')
-ylabel('dynamic range')
+xlabel('region', 'interpreter', 'latex')
+ylabel('dynamic range', 'interpreter', 'latex')
 
 
 %% DEMO FOR DRIFT DIFFUSION MODEL
@@ -210,8 +210,8 @@ plot(param.T, sol.y)
 plot(param.T, param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
 plot(param.T, -param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
 hold off;
-xlabel('time')
-ylabel('regional decision evidence')
+xlabel('time (s)', 'interpreter', 'latex')
+ylabel('regional decision evidence', 'interpreter', 'latex')
 
 
 %% DEMO FOR DRIFT DIFFUSION MODEL WITH SELF-COUPLING TERM
@@ -252,6 +252,6 @@ plot(param.T, sol.y)
 plot(param.T, param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
 plot(param.T, -param.thres*(ones(size(param.T))), 'k-', 'linewidth', 2);
 hold off;
-xlabel('time')
-ylabel('regional decision evidence')
+xlabel('time (s)', 'interpreter', 'latex')
+ylabel('regional decision evidence', 'interpreter', 'latex')
 

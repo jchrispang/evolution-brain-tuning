@@ -1,6 +1,6 @@
 % generate_paper_suppfigures.m
 % 
-% Matlab code to generate the supplemetary figures of the paper
+% Matlab code to generate the supplementary figures of the paper
 %
 % Note that the configuration of your computer (e.g., screen resolution)
 % affects how the figures created will look. Hence, they will not 100% 
@@ -70,11 +70,12 @@ marmoset = imread('artworks/marmoset.png');
 fontsize_axis = 10;
 fontsize_label = 12;
 
-show_padj = 1;
+show_padj = 0;
 
 data_foldername = 'data/data_figures';
 
 %% SUPPLEMENTARY FIGURE 1
+% FIGURE 2-FIGURE SUPPLEMENT 1 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 1
 data_SuppFigure1 = load(sprintf('%s/SuppFigure1.mat', data_foldername));
@@ -261,6 +262,7 @@ annotation(fig, 'textbox', [0.05, 0.65, 0.01, 0.01], 'string', 'B', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
   
 %% SUPPLEMENTARY FIGURE 2
+% FIGURE 3-FIGURE SUPPLEMENT 1 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 2
 data_SuppFigure2 = load(sprintf('%s/SuppFigure2.mat', data_foldername));
@@ -403,6 +405,7 @@ annotation(fig, 'textbox', [0.05, 0.36, 0.01, 0.01], 'string', 'C', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
  
 %% SUPPLEMENTARY FIGURE 3
+% FIGURE 3-FIGURE SUPPLEMENT 2 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 3
 data_SuppFigure3 = load(sprintf('%s/SuppFigure3.mat', data_foldername));
@@ -509,6 +512,7 @@ annotation(fig, 'textbox', [0.07, 0.49, 0.01, 0.01], 'string', 'B', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
 %% SUPPLEMENTARY FIGURE 4
+% FIGURE 3-FIGURE SUPPLEMENT 3 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 4
 data_SuppFigure4 = load(sprintf('%s/SuppFigure4.mat', data_foldername));
@@ -619,6 +623,7 @@ annotation(fig, 'textbox', [0.07, 0.49, 0.01, 0.01], 'string', 'B', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
 %% SUPPLEMENTARY FIGURE 5
+% FIGURE 3-FIGURE SUPPLEMENT 4 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 5
 data_SuppFigure5 = load(sprintf('%s/SuppFigure5.mat', data_foldername)); 
@@ -768,6 +773,7 @@ annotation(fig, 'textbox', [0.07, 0.36, 0.01, 0.01], 'string', 'C', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
 %% SUPPLEMENTARY FIGURE 6
+% FIGURE 3-FIGURE SUPPLEMENT 5 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 6
 data_SuppFigure6 = load(sprintf('%s/SuppFigure6.mat', data_foldername));
@@ -913,6 +919,7 @@ annotation(fig, 'textbox', [0.07, 0.35, 0.01, 0.01], 'string', 'C', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
 %% SUPPLEMENTARY FIGURE 7
+% FIGURE 3-FIGURE SUPPLEMENT 6 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 7
 data_SuppFigure7 = load(sprintf('%s/SuppFigure7.mat', data_foldername));
@@ -1052,6 +1059,7 @@ annotation(fig, 'textbox', [0.07, 0.35, 0.01, 0.01], 'string', 'C', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
 %% SUPPLEMENTARY FIGURE 8
+% FIGURE 3-FIGURE SUPPLEMENT 7 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 8
 data_SuppFigure8 = load(sprintf('%s/SuppFigure8.mat', data_foldername)); 
@@ -1132,6 +1140,7 @@ annotation(fig, 'textbox', [0.07, 0.47, 0.01, 0.01], 'string', 'B', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
 %% SUPPLEMENTARY FIGURE 9
+% FIGURE 3-FIGURE SUPPLEMENT 8 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 9
 data_SuppFigure9 = load(sprintf('%s/SuppFigure9.mat', data_foldername));
@@ -1201,7 +1210,7 @@ axis(ax1, 'equal')
 set(ax1, 'visible', 'off')
 
 % =========================================================================
-% B: model schematic
+% A right: model schematic
 % =========================================================================
 ax2 = axes('Position', [ax1.Position(1)+ax1.Position(3)*1.5 ax1.Position(2) 0.6 ax1.Position(4)]);
 circle_locs_x = [0.25, 0.6; 
@@ -1295,7 +1304,7 @@ text(mean(circle_locs_x(1,:)), circle_locs_y(1,2)-0.07, '$A_{ij}$', 'horizontala
 axis off
 
 % =========================================================================
-% C: tuning curve
+% B: tuning curve
 % =========================================================================
 for type_ind = 1:length(types)
     S_temp = data_SuppFigure9.tuningcurve.SE{type_ind};
@@ -1334,7 +1343,7 @@ for type_ind = 1:length(types)
 end
  
 % =========================================================================
-% D: dynamic range distribution
+% C: dynamic range distribution
 % =========================================================================
 subplot(3,length(types),2+((length(types)+1):length(types)*2))
 ax4 = gca;
@@ -1386,6 +1395,7 @@ annotation(fig, 'textbox', [0.07, 0.35, 0.01, 0.01], 'string', 'C', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
 %% SUPPLEMENTARY FIGURE 10
+% FIGURE 3-FIGURE SUPPLEMENT 9 OF THE eLife PAPER
 
 % load all data relevant to Supplementary Figure 10
 data_SuppFigure10 = load(sprintf('%s/SuppFigure10.mat', data_foldername)); 
@@ -1396,11 +1406,32 @@ titles = {'human', 'chimpanzee'};
 cmap = [color_brown; color_green];
 stats_to_plot = 'dynamic_range';
 
+parc_lh = dlmread(parc_filename('lh'));
+parcels_lh = unique(parc_lh(parc_lh>0));
+num_parcels_lh = length(parcels_lh);
+parc_rh = dlmread(parc_filename('rh'));
+parcels_rh = unique(parc_rh(parc_rh>0));
+num_parcels_rh = length(parcels_rh);
+
 pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'SuppFigure10'));
 
-image_width = 0.15;
- 
-fig = figure('Position', [200 200 800 300]);
+image_width = 0.05;
+
+factor_x = 1.2;
+factor_y = 1.3;
+init_x = 0.06;
+init_y = 0.08;
+length_x = (1-1.1*init_x)/(factor_x*(2-1) + 1);
+length_y = (1-1.8*init_y)/(factor_y*(2-1) + 1);
+
+fig = figure('Position', [200 200 800 600]);
+ax0 = axes('Position', [0.12 0.62 0.35 0.3]);
+ax0_position = ax0.Position;
+set(ax0,'visible','off')
+
+% =========================================================================
+% A: dynamic range vs anterior-posterior location
+% =========================================================================
 for type_ind = 1:length(types)
     type = types{type_ind};
     nodeLocations = data_SuppFigure10.coordinates{type_ind};
@@ -1412,8 +1443,7 @@ for type_ind = 1:length(types)
     end
     bw = image_to_plot>0;
     
-    subplot(1,2,type_ind)
-    ax1 = gca;
+    ax1 = axes('Position', [init_x+factor_x*length_x*(type_ind-1) init_y+factor_y*length_y*(2-1) length_x length_y]);
     data_to_plot_x = nodeLocations(:,2);
     data_to_plot_y = zscore(data_SuppFigure10.tuningcurve.stats{type_ind}.(stats_to_plot));
     hold on;
@@ -1441,26 +1471,10 @@ for type_ind = 1:length(types)
                'fontsize', fontsize_label, 'horizontalalignment', 'center', 'headstyle', 'plain', 'headlength', 5, 'headwidth', 5)
            
            
-    ax1_image= axes('Position', [ax1.Position(1)-0.04 ax1.Position(2)+ax1.Position(4)*0.8 image_width image_width]);
+    ax1_image = axes('Position', [ax1.Position(1)-0.0 ax1.Position(2)+ax1.Position(4)*0.85 image_width image_width]);
     imshow(bw);
     colormap(ax1_image, flipud(gray))
 end
-
-%% SUPPLEMENTARY FIGURE 11
-
-% load all data relevant to Supplementary Figure 11
-data_SuppFigure11 = load(sprintf('%s/SuppFigure11.mat', data_foldername)); 
-
-N = 114;
-
-pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'SuppFigure11'));
-
-parc_lh = dlmread(parc_filename('lh'));
-parcels_lh = unique(parc_lh(parc_lh>0));
-num_parcels_lh = length(parcels_lh);
-parc_rh = dlmread(parc_filename('rh'));
-parcels_rh = unique(parc_rh(parc_rh>0));
-num_parcels_rh = length(parcels_rh);
 
 type_ind = 1;
 type = 'human';
@@ -1472,13 +1486,12 @@ boundary_method = 'midpoint';
 BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,double(surface_to_plot_lh.faces),parc_lh,boundary_method);
 BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,double(surface_to_plot_rh.faces),parc_rh,boundary_method);
 
-clims = [min(data_SuppFigure11.expansion) max(data_SuppFigure11.expansion)];
+clims = [min(data_SuppFigure10.expansion) max(data_SuppFigure10.expansion)];
 clims(1) = clims(1)*0.9;
 
-data_parcel = data_SuppFigure11.expansion;
-% cmap = [0.5 0.5 0.5; turbo];
-cmap = cbrewer('seq', 'YlGnBu', 130, 'pchip');
-cmap = [0.5 0.5 0.5; flipud(cmap(end-N+1:end,:))];
+data_parcel = data_SuppFigure10.expansion;
+surface_cmap = cbrewer('seq', 'YlGnBu', 130, 'pchip');
+surface_cmap = [0.5 0.5 0.5; flipud(surface_cmap(end-N+1:end,:))];
 
 data_to_plot_lh = zeros(size(surface_to_plot_lh.vertices,1),1);
 data_to_plot_rh = zeros(size(surface_to_plot_rh.vertices,1),1);
@@ -1495,17 +1508,12 @@ for ii=1:num_parcels_rh
 end
 data_to_plot_rh(find(parc_rh==0)) = clims(1);
 
-ax1_positions = [0.12 0.13 0.6 0.8];
-factor_y = 1.05;
-init_x = ax1_positions(1) + ax1_positions(3)*1.07;
-init_y = ax1_positions(2);
-length_y = (ax1_positions(4))/(factor_y*(4-1) + 1);
-length_x = length_y*1.1;
-
-fig = figure; 
-ax1 = axes('Position', [ax1_positions(1) ax1_positions(2) ax1_positions(3) ax1_positions(4)]);
-data_to_plot_x = data_SuppFigure11.coordinates{type_ind}(:,2);
-data_to_plot_y = data_SuppFigure11.expansion;
+% =========================================================================
+% B: expansion vs anterior-posterior location
+% =========================================================================
+ax2 = axes('Position', [init_x init_y length_x*0.9 length_y]);
+data_to_plot_x = data_SuppFigure10.coordinates{type_ind}(:,2);
+data_to_plot_y = data_SuppFigure10.expansion;
 hold on;
 plot(data_to_plot_x, data_to_plot_y, '.', 'markersize', 20, 'color', 0.5*ones(1,3))
 plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
@@ -1513,7 +1521,7 @@ plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_p
 hold off;
 xline(0, 'k:');
 set(gca, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xtick', [], 'xticklabel', {}, 'ylim', [0.2 5]);
-ylabel('regional cortical expansion', 'fontsize', fontsize_label)
+ylabel('regional cortical expansion', 'fontsize', fontsize_label, 'interpreter', 'latex')
 [rho,pval] = corr(data_to_plot_x, data_to_plot_y, 'type', 'pearson');
 text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))*2.5, sprintf('r = %.2f', rho), ...
     'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'bottom', 'horizontalalignment', 'right');
@@ -1521,18 +1529,26 @@ if ~show_padj
     text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))*1.07, utils.extract_pvalue_text(pval), ...
         'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'bottom', 'horizontalalignment', 'right');
 else
-    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))*1.07, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(1)), 1, ''), ...
+    text(max(get(gca, 'xlim')), min(get(gca, 'ylim'))*1.07, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(3)), 1, ''), ...
         'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'bottom', 'horizontalalignment', 'right');
 end
-annot = annotation('textarrow', [ax1.Position(1)+ax1.Position(3)*0.65 ax1.Position(1)+ax1.Position(3)*0.35], (ax1.Position(2)-0.04)*ones(1,2), 'String', 'anterior', ...
+annot = annotation('textarrow', [ax2.Position(1)+ax2.Position(3)*0.65 ax2.Position(1)+ax2.Position(3)*0.35], (ax2.Position(2)-0.03)*ones(1,2), 'String', 'anterior', ...
            'fontsize', fontsize_label, 'horizontalalignment', 'center', 'headstyle', 'plain', 'headlength', 5, 'headwidth', 5);
 annotation('textarrow', [annot.X(2) annot.X(1)], [annot.Y(1) annot.Y(2)], 'String', 'posterior', ...
            'fontsize', fontsize_label, 'horizontalalignment', 'center', 'headstyle', 'plain', 'headlength', 5, 'headwidth', 5)
 
+% =========================================================================
+% B inset: surface plot of expansion
+% =========================================================================
+factor_y_2 = 1.1;
+init_x_2 = ax2.Position(1) + ax2.Position(3)*1.07;
+init_y_2 = ax2.Position(2)*1.1;
+length_y_2 = (ax2.Position(4)*1)/(factor_y_2*(4-1) + 1);
+length_x_2 = length_y_2*1.1;
 
 %%% left lateral view
-ax1_1 = axes('Position', [init_x init_y+factor_y*length_y*(4-1) length_x length_y]);
-patch(ax1_1, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
+ax2_1 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(4-1) length_x_2 length_y_2]);
+patch(ax2_1, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
            'EdgeColor', 'none', 'FaceColor', 'interp');
 hold on;
 for ii = 1:length(BOUNDARY_lh)
@@ -1543,13 +1559,13 @@ view([-90 0]);
 caxis(clims)
 material dull
 camlight('headlight');
-colormap(ax1_1, cmap)
+colormap(ax2_1, surface_cmap)
 axis off
 axis image
 
 %%% left medial view
-ax1_2 = axes('Position', [init_x init_y+factor_y*length_y*(3-1) length_x length_y]);
-patch(ax1_2, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
+ax2_2 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(3-1) length_x_2 length_y_2]);
+patch(ax2_2, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
            'EdgeColor', 'none', 'FaceColor', 'interp');
 hold on;
 for ii = 1:length(BOUNDARY_lh)
@@ -1560,13 +1576,13 @@ view([90 0]);
 caxis(clims)
 material dull
 camlight('headlight');
-colormap(ax1_2, cmap)
+colormap(ax2_2, surface_cmap)
 axis off
 axis image
 
 %%% right lateral view
-ax1_3 = axes('Position', [init_x init_y+factor_y*length_y*(2-1) length_x length_y]);
-patch(ax1_3, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
+ax2_3 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(2-1) length_x_2 length_y_2]);
+patch(ax2_3, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
            'EdgeColor', 'none', 'FaceColor', 'interp');
 hold on;
 for ii = 1:length(BOUNDARY_rh)
@@ -1577,13 +1593,13 @@ view([90 0]);
 caxis(clims)
 material dull
 camlight('headlight');
-colormap(ax1_3, cmap)
+colormap(ax2_3, surface_cmap)
 axis off
 axis image
 
 %%% right medial view
-ax1_4 = axes('Position', [init_x init_y+factor_y*length_y*(1-1) length_x length_y]);
-patch(ax1_4, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
+ax2_4 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(1-1) length_x_2 length_y_2]);
+patch(ax2_4, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
            'EdgeColor', 'none', 'FaceColor', 'interp');
 hold on;
 for ii = 1:length(BOUNDARY_rh)
@@ -1594,28 +1610,80 @@ view([-90 0]);
 caxis(clims)
 material dull
 camlight('headlight');
-colormap(ax1_4, cmap)
+colormap(ax2_4, surface_cmap)
 axis off
 axis image
 
-cbar = colorbar(ax1_4,'southoutside');
+cbar = colorbar(ax2_4,'southoutside');
 ylabel(cbar, 'cortical expansion', 'fontsize', fontsize_label, 'interpreter', 'latex')
 set(cbar, 'fontsize', fontsize_axis, 'ticklength', 0.04, ...
-    'position', [ax1_4.Position(1)+ax1_4.Position(3)*0.2, ax1_4.Position(2)*0.3, ax1_4.Position(3)*0.6, 0.02], ...
+    'position', [ax2_4.Position(1)+ax2_4.Position(3)*0.15, ax2_4.Position(2)*0.33, ax2_4.Position(3)*0.7, 0.015], ...
     'ytick', [])
-annotation(fig, 'textbox', [cbar.Position(1)-0.042, cbar.Position(2)*1, 0.04, 0.01], 'string', 'low', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [cbar.Position(1)-0.037, cbar.Position(2)*1, 0.04, 0.01], 'string', 'low', 'edgecolor', 'none', ...
                'fontsize', fontsize_axis, 'horizontalalignment', 'center', 'verticalalignment', 'middle')
-annotation(fig, 'textbox', [cbar.Position(1)+cbar.Position(3)+0.01, cbar.Position(2)*1, 0.04, 0.01], 'string', 'high', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [cbar.Position(1)+cbar.Position(3)+0.003, cbar.Position(2)*1, 0.04, 0.01], 'string', 'high', 'edgecolor', 'none', ...
            'fontsize', fontsize_axis, 'horizontalalignment', 'center', 'verticalalignment', 'middle')   
-           
-annotation('textbox', [ax1_1.Position(1)-0.04, ax1_1.Position(2)-0.06, 0.1, 0.1], 'string', 'LH', ...
+       
+annotation('textbox', [ax2_1.Position(1)-0.04, ax2_1.Position(2)-0.055, 0.1, 0.1], 'string', 'LH', ...
    'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
    'verticalalignment', 'middle', 'fontweight', 'b')
-annotation('textbox', [ax1_1.Position(1)-0.04, ax1_3.Position(2)-0.06, 0.1, 0.1], 'string', 'RH', ...
+annotation('textbox', [ax2_1.Position(1)-0.04, ax2_3.Position(2)-0.055, 0.1, 0.1], 'string', 'RH', ...
    'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
    'verticalalignment', 'middle', 'fontweight', 'b')
+  
+% =========================================================================
+% C: dynamic range of highly and lowly expanded regions
+% =========================================================================
+type_ind = 1;
+type = 'human';
+AP = data_SuppFigure10.coordinates{type_ind}(:,2);
+expansion = data_SuppFigure10.expansion;
+dynamic_range = zscore(data_SuppFigure10.tuningcurve.stats{type_ind}.(stats_to_plot));
 
-%% SUPPLEMENTARY FIGURE 12
+threshold_bottom = 30;
+threshold_top = 80;
+expansion_pctile = prctile(data_SuppFigure10.expansion, [threshold_bottom, threshold_top]);
+AP_pctile = prctile(AP, [threshold_bottom, threshold_top]);
+
+bottom_ind = find(expansion<=expansion_pctile(1) & AP<=AP_pctile(1));
+top_ind = find(expansion>=expansion_pctile(2) & AP>=AP_pctile(2));
+
+ax3 = axes('Position', [init_x+factor_x*length_x*1.2*(2-1) init_y+factor_y*length_y*(1-1) length_x*0.75 length_y]);
+data_violin = utils.padconcatenation(dynamic_range(bottom_ind), dynamic_range(top_ind), 2);
+violins = utils.violinplot(data_violin, {});
+for jj = 1:2
+    violins(jj).MedianPlot.SizeData = 50;
+    violins(jj).ViolinColor = 0.3*ones(1,3);
+    violins(jj).ViolinAlpha = 0.2;
+    violins(jj).ScatterPlot.SizeData = 25;
+    violins(jj).ScatterPlot.MarkerFaceAlpha = 1;
+    violins(jj).BoxColor = [0 0 0];
+    violins(jj).BoxWidth = 0.01;
+    violins(jj).WhiskerPlot.LineStyle = 'none';
+end
+
+set(ax3, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xticklabel', {'  lowly expanded\newline posterior regions', ' highly expanded\newline anterior regions'})
+ylabel('dynamic range (z score)', 'fontsize', fontsize_label, 'interpreter', 'latex')
+
+[~,pval] = ttest2(dynamic_range(bottom_ind), dynamic_range(top_ind));
+if ~show_padj
+    text(min(get(gca, 'xlim'))*1.2, max(get(gca, 'ylim'))*1, utils.extract_pvalue_text(pval), ...
+                'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'left');
+else
+    text(min(get(gca, 'xlim'))*1.2, max(get(gca, 'ylim'))*1, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(4)), 1, ''), ...
+                'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'left');
+end
+    
+%%% panel letters
+annotation(fig, 'textbox', [0.01, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.01, 0.48, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+annotation(fig, 'textbox', [0.61, 0.48, 0.01, 0.01], 'string', 'C', 'edgecolor', 'none', ...
+        'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
+    
+%% SUPPLEMENTARY FIGURE 11
+% FIGURE 3-FIGURE SUPPLEMENT 10 OF THE eLife PAPER
 
 types = {'human', 'chimp'};
 titles = {'human', 'chimpanzee'};
@@ -1758,10 +1826,11 @@ for net = 1:7
         'fontsize', fontsize_label, 'fontweight', 'b', 'horizontalalignment', 'center')
 end
     
-%% SUPPLEMENTARY FIGURE 13
+%% SUPPLEMENTARY FIGURE 12
+% FIGURE 5-FIGURE SUPPLEMENT 1 OF THE eLife PAPER
 
-% load all data relevant to Supplementary Figure 13
-data_SuppFigure13 = load(sprintf('%s/SuppFigure13.mat', data_foldername));
+% load all data relevant to Supplementary Figure 12
+data_SuppFigure12 = load(sprintf('%s/SuppFigure12.mat', data_foldername));
 
 cmap = color_blue;
 S_transition = 0.3;
@@ -1771,7 +1840,7 @@ image_width = 0.1;
  
 fig = figure('Position', [200 200 400 450]);
 
-stats_temp = data_SuppFigure13.tuningcurve.stats;
+stats_temp = data_SuppFigure12.tuningcurve.stats;
 image_to_plot = macaque;
 
 bw = image_to_plot>0;
@@ -1789,7 +1858,7 @@ ax1 = gca;
 set(ax1, 'Position', [ax1.Position(1)+0.035 ax1.Position(2)-0.14 ax1.Position(3)+0.01 ax1.Position(4)+0.14])
 hold on;
 for ii=1:length(stats_temp.max)
-    plot(data_SuppFigure13.tuningcurve.w, data_SuppFigure13.tuningcurve.S(xval_transition_ind(ii),:), 'color', brighten(gain_cmap(ii,:),brighten_vec(ii)))
+    plot(data_SuppFigure12.tuningcurve.w, data_SuppFigure12.tuningcurve.S(xval_transition_ind(ii),:), 'color', brighten(gain_cmap(ii,:),brighten_vec(ii)))
 end
 hold off;
 set(gca, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'ylim', [0 1], ...
@@ -1834,10 +1903,11 @@ annotation(fig, 'textbox', [0.05, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor',
 annotation(fig, 'textbox', [0.05, 0.32, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
-%% SUPPLEMENTARY FIGURE 14
+%% SUPPLEMENTARY FIGURE 13
+% FIGURE 6-FIGURE SUPPLEMENT 1 OF THE eLife PAPER
 
-% load all data relevant to Supplementary Figure 14
-data_SuppFigure14 = load(sprintf('%s/SuppFigure14.mat', data_foldername)); 
+% load all data relevant to Supplementary Figure 13
+data_SuppFigure13 = load(sprintf('%s/SuppFigure13.mat', data_foldername)); 
 
 fig = figure('Position', [200 200 700 300]);
 
@@ -1845,7 +1915,7 @@ fig = figure('Position', [200 200 700 300]);
 % left: time series
 % =========================================================================
 ax1_left = axes('Position', [0.07 0.15 0.38 0.8]);
-plot(data_SuppFigure14.timeseries.time, data_SuppFigure14.timeseries.S, 'k', 'linewidth', 1.5)
+plot(data_SuppFigure13.timeseries.time, data_SuppFigure13.timeseries.S, 'k', 'linewidth', 1.5)
 set(ax1_left, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'ytick', []);
 xlabel('time (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
 ylabel('regional synaptic response, $S$', 'fontsize', fontsize_label, 'interpreter', 'latex')
@@ -1856,8 +1926,8 @@ box off;
 % =========================================================================
 ax1_right = axes('Position', [ax1_left.Position(1)+ax1_left.Position(3)+0.15 ax1_left.Position(2) ax1_left.Position(3) ax1_left.Position(4)]);
 hold on;
-plot(data_SuppFigure14.autocorrelation.lags, data_SuppFigure14.autocorrelation.acf_data/max(data_SuppFigure14.autocorrelation.acf_data), 'k', 'linewidth', 1.5)
-plot(data_SuppFigure14.autocorrelation.lags, data_SuppFigure14.autocorrelation.acf_fit/max(data_SuppFigure14.autocorrelation.acf_fit), 'r--', 'linewidth', 2)
+plot(data_SuppFigure13.autocorrelation.lags, data_SuppFigure13.autocorrelation.acf_data/max(data_SuppFigure13.autocorrelation.acf_data), 'k', 'linewidth', 1.5)
+plot(data_SuppFigure13.autocorrelation.lags, data_SuppFigure13.autocorrelation.acf_fit/max(data_SuppFigure13.autocorrelation.acf_fit), 'r--', 'linewidth', 2)
 hold off;
 set(ax1_right, 'fontsize', fontsize_axis, 'ticklength', [0.02, 0.02], 'xlim', [0 5], 'ytick', []);
 xlabel('time lag, $t$ (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
@@ -1867,10 +1937,11 @@ set(leg, 'fontsize', fontsize_label, 'box', 'off', 'numcolumns', 1)
 box off;
 annotation('arrow', [ax1_left.Position(1)+ax1_left.Position(3)+0.02 ax1_right.Position(1)-0.05], [ax1_left.Position(2)+ax1_left.Position(4)*0.5 ax1_left.Position(2)+ax1_left.Position(4)*0.5])
 
-%% SUPPLEMENTARY FIGURE 15
+%% SUPPLEMENTARY FIGURE 14
+% FIGURE 6-FIGURE SUPPLEMENT 2 OF THE eLife PAPER
 
-% load all data relevant to Supplementary Figure 15
-data_SuppFigure15 = load(sprintf('%s/SuppFigure15.mat', data_foldername));
+% load all data relevant to Supplementary Figure 14
+data_SuppFigure14 = load(sprintf('%s/SuppFigure14.mat', data_foldername));
 
 types = {'human', 'chimp', 'macaque', 'marmoset'};
 titles = {'human', 'chimpanzee', 'macaque', 'marmoset'};
@@ -1878,9 +1949,9 @@ titles = {'human', 'chimpanzee', 'macaque', 'marmoset'};
 cmap = [color_brown; color_green; color_blue; color_purple];
 
 w_interest_list = [0.45, 0.45, 0.32, 0.45];
-w_interest_ind = dsearchn(data_SuppFigure15.tuningcurve.w', w_interest_list');
+w_interest_ind = dsearchn(data_SuppFigure14.tuningcurve.w', w_interest_list');
  
-pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'SuppFigure15'));
+pvals_adj_ind = find(strcmpi(multiple_comparisons(:,1), 'SuppFigure14'));
 
 image_width = 0.06;
  
@@ -1906,8 +1977,8 @@ for type_ind=[3,4]
     % A: correlation of timescales and dynamic range
     % =========================================================================
     ax1 = axes('Position', [ax0_position(1)+(ax0_position(3)+0.1)*(type_ind-1-2) ax0_position(2) ax0_position(3) ax0_position(4)]);
-    data_to_plot_x = tiedrank(zscore(data_SuppFigure15.tuningcurve.stats{type_ind}.dynamic_range));
-    data_to_plot_y = tiedrank(data_SuppFigure15.tuningcurve.stats{type_ind}.tau_neural(:,w_interest_ind(type_ind)));
+    data_to_plot_x = tiedrank(zscore(data_SuppFigure14.tuningcurve.stats{type_ind}.dynamic_range));
+    data_to_plot_y = tiedrank(data_SuppFigure14.tuningcurve.stats{type_ind}.tau_neural(:,w_interest_ind(type_ind)));
     hold on;
     plot(data_to_plot_x, data_to_plot_y, '.', 'color', cmap(type_ind,:), 'markersize', 20)
     plot(data_to_plot_x, polyval(polyfit(data_to_plot_x,data_to_plot_y,1), data_to_plot_x), ...
@@ -1951,8 +2022,8 @@ for type_ind=[3,4]
     % B: human - macaque/marmoset whole-brain accuracy
     % =========================================================================
     ax2 = axes('Position', [ax1.Position(1) 0.1 ax0_position(3) ax0_position(4)]);
-    data_to_plot_x = data_SuppFigure15.decision.time;
-    data_to_plot_y = mean(data_SuppFigure15.decision.accuracy{1},1)-mean(data_SuppFigure15.decision.accuracy{type_ind},1);
+    data_to_plot_x = data_SuppFigure14.decision.time;
+    data_to_plot_y = mean(data_SuppFigure14.decision.accuracy{1},1)-mean(data_SuppFigure14.decision.accuracy{type_ind},1);
     [~, min_diff_ind] = min(data_to_plot_y);
     hold on;
     plot(data_to_plot_x, data_to_plot_y, 'k-', 'linewidth', 2)
@@ -1984,14 +2055,16 @@ annotation(fig, 'textbox', [0.03, 0.98, 0.01, 0.01], 'string', 'A', 'edgecolor',
 annotation(fig, 'textbox', [0.03, 0.49, 0.01, 0.01], 'string', 'B', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 
-%% SUPPLEMENTARY FIGURE 16
+%% SUPPLEMENTARY FIGURE 15
+% FIGURE 6-FIGURE SUPPLEMENT 3 OF THE eLife PAPER
 
-% load all data relevant to Supplementary Figure 16
-data_SuppFigure16 = load(sprintf('%s/SuppFigure16.mat', data_foldername));
+% load all data relevant to Supplementary Figure 15
+data_SuppFigure15 = load(sprintf('%s/SuppFigure15.mat', data_foldername));
 
 N = 114;
 types = {'human', 'chimp'};
 
+lambda_interest = [0, 20, -20];
 colors = {'k', 'r', 'b'};
 
 node_interests_colors = brighten(lines(6),0.3);
@@ -2047,8 +2120,8 @@ type_ind = 1;
 ax2 = axes('Position', [ax1.Position(1)+ax1.Position(3)*1.17 ax1.Position(2)+0.05 ax1.Position(3)*0.85 ax1.Position(4)*0.8]);
 data_to_plot_x = 1:N;
 hold on;
-for ii=1:length(data_SuppFigure16.decision.lambda_interest)
-    data_to_plot_y = data_SuppFigure16.decision.reaction_time_lambda_interest{type_ind}(:,ii);
+for ii=1:length(data_SuppFigure15.decision.lambda_interest)
+    data_to_plot_y = data_SuppFigure15.decision.reaction_time_lambda_interest{type_ind}(:,ii);
     
     plot(data_to_plot_x, mean(data_to_plot_y, 2), '.-', 'color', colors{ii}, 'markersize', 12, 'linewidth', 1)           
 end
@@ -2065,10 +2138,10 @@ ylabel('reaction time (s)', 'fontsize', fontsize_label, 'interpreter', 'latex')
 type_ind = 1;
 ax3 = axes('Position', [ax2.Position(1)+ax2.Position(3)*1.43 ax2.Position(2) ax2.Position(3) ax2.Position(4)]);
 node = 84;
-data_to_plot_x = data_SuppFigure16.decision.time;
+data_to_plot_x = data_SuppFigure15.decision.time;
 hold on;
-for ii=1:length(data_SuppFigure16.decision.lambda_interest)
-    data_to_plot_y = data_SuppFigure16.decision.region_accuracy_lambda_interest{type_ind}(:,ii);
+for ii=1:length(data_SuppFigure15.decision.lambda_interest)
+    data_to_plot_y = data_SuppFigure15.decision.region_accuracy_lambda_interest{type_ind}(:,ii);
     
     plot(data_to_plot_x, data_to_plot_y, '-', 'color', colors{ii}, 'linewidth', 2)           
 end
@@ -2081,12 +2154,12 @@ ylabel('regional accuracy ($\%$)', 'fontsize', fontsize_label, 'interpreter', 'l
 
 %%% D: human - chimp whole-brain accuracy for some lambda
 ax4 = axes('Position', [0.1 0.1 ax2.Position(3)*1.45 ax2.Position(4)]);
-data_to_plot_x = data_SuppFigure16.decision.time;
+data_to_plot_x = data_SuppFigure15.decision.time;
 hold on;
-for ii=1:length(data_SuppFigure16.decision.lambda_interest)
-    lambda_ind = dsearchn(data_SuppFigure16.decision.lambda_vec', lambda_interest(ii));
-    data_to_plot_y = data_SuppFigure16.decision.mean_accuracy_lambda_interest{1}(:,ii) - ...
-                     data_SuppFigure16.decision.mean_accuracy_lambda_interest{2}(:,ii);
+for ii=1:length(data_SuppFigure15.decision.lambda_interest)
+    lambda_ind = dsearchn(data_SuppFigure15.decision.lambda_vec', lambda_interest(ii));
+    data_to_plot_y = data_SuppFigure15.decision.mean_accuracy_lambda_interest{1}(:,ii) - ...
+                     data_SuppFigure15.decision.mean_accuracy_lambda_interest{2}(:,ii);
     
     plot(data_to_plot_x, data_to_plot_y, '-', 'color', colors{ii}, 'linewidth', 2)           
 end
@@ -2104,8 +2177,8 @@ title('self-coupling in human and chimpanzee', 'fontsize', fontsize_axis)
 
 %%% E: human - chimp whole-brain accuracy at tmin
 ax5 = axes('Position', [ax4.Position(1)+ax4.Position(3)*1.38 ax4.Position(2) ax4.Position(3) ax4.Position(4)]);
-data_to_plot_x = data_SuppFigure16.decision.lambda_vec;
-data_to_plot_y = data_SuppFigure16.decision.accuracy_difference;
+data_to_plot_x = data_SuppFigure15.decision.lambda_vec;
+data_to_plot_y = data_SuppFigure15.decision.accuracy_difference;
 data_to_plot_x_pos = find(data_to_plot_x>0);
 data_to_plot_x_neg = find(data_to_plot_x<0);
 hold on;
@@ -2144,17 +2217,18 @@ annotation(fig, 'textbox', [0.03, 0.5, 0.01, 0.01], 'string', 'D', 'edgecolor', 
 annotation(fig, 'textbox', [0.54, 0.5, 0.01, 0.01], 'string', 'E', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
     
-%% SUPPLEMENTARY FIGURE 17
+%% SUPPLEMENTARY FIGURE 16
+% FIGURE 6-FIGURE SUPPLEMENT 4 OF THE eLife PAPER
 
-% load all data relevant to Supplementary Figure 17
-data_SuppFigure17 = load(sprintf('%s/SuppFigure17.mat', data_foldername));
+% load all data relevant to Supplementary Figure 16
+data_SuppFigure16 = load(sprintf('%s/SuppFigure16.mat', data_foldername));
 
 nodeLocations = region_centroids;
 markersize = 50;
 
 FN = 7;
-data_to_plot_x = data_SuppFigure17.decision.time;
-data_to_plot_y = mean(data_SuppFigure17.decision.accuracy{1}(RSN_indices==FN,:),1)-mean(data_SuppFigure17.decision.accuracy{2}(RSN_indices==FN,:),1);
+data_to_plot_x = data_SuppFigure16.decision.time;
+data_to_plot_y = mean(data_SuppFigure16.decision.accuracy{1}(RSN_indices==FN,:),1)-mean(data_SuppFigure16.decision.accuracy{2}(RSN_indices==FN,:),1);
 
 parc_lh = dlmread(parc_filename('lh'));
 parcels_lh = unique(parc_lh(parc_lh>0));

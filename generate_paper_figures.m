@@ -70,7 +70,7 @@ marmoset = imread('artworks/marmoset.png');
 fontsize_axis = 10;
 fontsize_label = 12;
 
-show_padj = 1;
+show_padj = 0;
 
 data_foldername = 'data/data_figures';
 
@@ -279,11 +279,11 @@ axis square
 % =========================================================================
 % E: topological metrics
 % =========================================================================
-factor_x = 1.8;
+factor_x = 1.3;
 factor_y = 1.01;
 init_x = ax0_position(1)+0.05;
 init_y = 0.03;
-length_x = (ax3.Position(1)+ax3.Position(3)*0.55-init_x)/(factor_x*(2-1) + 1);
+length_x = (ax3.Position(1)+ax3.Position(3)*0.65-init_x)/(factor_x*(2-1) + 1);
 length_y = (ax3.Position(2)-0.03-2*init_y)/(factor_y*(1-1) + 1);
 
 for ii=1:2
@@ -336,134 +336,136 @@ for ii=1:2
         colormap(ax4_1_image, flipud(gray))
     end
     
-    %%% human - chimpanzee surface plot
-    factor_y_2 = 0.9;
-    init_x_2 = ax4_1.Position(1) + ax4_1.Position(3)*1.05;
-    init_y_2 = ax4_1.Position(2)*1.3;
-    length_y_2 = (ax4_1.Position(4))/(factor_y_2*(4-1) + 1);
-    length_x_2 = length_y_2*1.2;
-    
-    parc_lh = dlmread(parc_filename('lh'));
-    parcels_lh = unique(parc_lh(parc_lh>0));
-    num_parcels_lh = length(parcels_lh);
-    parc_rh = dlmread(parc_filename('rh'));
-    parcels_rh = unique(parc_rh(parc_rh>0));
-    num_parcels_rh = length(parcels_rh);
+    if ii==2
+        %%% human - chimpanzee surface plot
+        factor_y_2 = 0.95;
+        init_x_2 = ax4_1.Position(1) + ax4_1.Position(3)*1.05;
+        init_y_2 = ax4_1.Position(2)*1.9;
+        length_y_2 = (ax4_1.Position(4)*0.95)/(factor_y_2*(4-1) + 1);
+        length_x_2 = length_y_2*1.2;
 
-    surface_to_plot_lh = gifti(surface_file{1}.lh);
-    surface_to_plot_rh = gifti(surface_file{1}.rh);
+        parc_lh = dlmread(parc_filename('lh'));
+        parcels_lh = unique(parc_lh(parc_lh>0));
+        num_parcels_lh = length(parcels_lh);
+        parc_rh = dlmread(parc_filename('rh'));
+        parcels_rh = unique(parc_rh(parc_rh>0));
+        num_parcels_rh = length(parcels_rh);
 
-    boundary_method = 'midpoint';
-    BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,double(surface_to_plot_lh.faces),parc_lh,boundary_method);
-    BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,double(surface_to_plot_rh.faces),parc_rh,boundary_method);
+        surface_to_plot_lh = gifti(surface_file{1}.lh);
+        surface_to_plot_rh = gifti(surface_file{1}.rh);
 
-    data_parcel = bct_stats{1}.(stats_to_plot) - bct_stats{2}.(stats_to_plot);
+        boundary_method = 'midpoint';
+        BOUNDARY_lh = findROIboundaries(surface_to_plot_lh.vertices,double(surface_to_plot_lh.faces),parc_lh,boundary_method);
+        BOUNDARY_rh = findROIboundaries(surface_to_plot_rh.vertices,double(surface_to_plot_rh.faces),parc_rh,boundary_method);
 
-    data_to_plot_lh = zeros(size(surface_to_plot_lh.vertices,1),1);
-    data_to_plot_rh = zeros(size(surface_to_plot_rh.vertices,1),1);
-    for jj=1:num_parcels_lh
-        parcel = parcels_lh(jj);
+        data_parcel = bct_stats{1}.(stats_to_plot) - bct_stats{2}.(stats_to_plot);
 
-        data_to_plot_lh(find(parc_lh==parcel)) = data_parcel(jj);
+        data_to_plot_lh = zeros(size(surface_to_plot_lh.vertices,1),1);
+        data_to_plot_rh = zeros(size(surface_to_plot_rh.vertices,1),1);
+        for jj=1:num_parcels_lh
+            parcel = parcels_lh(jj);
+
+            data_to_plot_lh(find(parc_lh==parcel)) = data_parcel(jj);
+        end
+        for jj=1:num_parcels_rh
+            parcel = parcels_rh(jj);
+
+            data_to_plot_rh(find(parc_rh==parcel)) = data_parcel(num_parcels_lh+jj);
+        end
+
+        clims = [min(data_parcel), max(data_parcel)];
+
+        ind_zeros = find(parc_lh==0);
+        data_to_plot_lh(data_to_plot_lh<clims(1)) = clims(1);
+        data_to_plot_lh(data_to_plot_lh>clims(2)) = clims(2);
+        data_to_plot_lh(ind_zeros) = clims(1)*1.1;
+        ind_zeros = find(parc_rh==0);
+        data_to_plot_rh(data_to_plot_rh<clims(1)) = clims(1);
+        data_to_plot_rh(data_to_plot_rh>clims(2)) = clims(2);
+        data_to_plot_rh(ind_zeros) = clims(1)*1.1;
+        clims(1) = clims(1)*1.1;
+
+        %%% left lateral view
+        ax5_1 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(4-1) length_x_2 length_y_2]);
+        patch(ax5_1, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
+                   'EdgeColor', 'none', 'FaceColor', 'interp');
+        hold on;
+        for jj = 1:length(BOUNDARY_lh)
+                plot3(BOUNDARY_lh{jj}(:,1), BOUNDARY_lh{jj}(:,2), BOUNDARY_lh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+        end
+        hold off;
+        view([-90 0]);
+        caxis(clims)
+        material dull
+        camlight('headlight');
+        colormap(ax5_1, [0.5 0.5 0.5; utils.bluewhitered])
+        axis off
+        axis image
+
+        %%% left medial view
+        ax5_2 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(3-1) length_x_2 length_y_2]);
+        patch(ax5_2, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
+                   'EdgeColor', 'none', 'FaceColor', 'interp');
+        hold on;
+        for jj = 1:length(BOUNDARY_lh)
+                plot3(BOUNDARY_lh{jj}(:,1), BOUNDARY_lh{jj}(:,2), BOUNDARY_lh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+        end
+        hold off;
+        view([90 0]);
+        caxis(clims)
+        material dull
+        camlight('headlight');
+        colormap(ax5_2, [0.5 0.5 0.5; utils.bluewhitered])
+        axis off
+        axis image
+
+        %%% right lateral view
+        ax5_3 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(2-1) length_x_2 length_y_2]);
+        patch(ax5_3, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
+                   'EdgeColor', 'none', 'FaceColor', 'interp');
+        hold on;
+        for jj = 1:length(BOUNDARY_rh)
+                plot3(BOUNDARY_rh{jj}(:,1), BOUNDARY_rh{jj}(:,2), BOUNDARY_rh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+        end
+        hold off;
+        view([90 0]);
+        caxis(clims)
+        material dull
+        camlight('headlight');
+        colormap(ax5_3, [0.5 0.5 0.5; utils.bluewhitered])
+        axis off
+        axis image
+
+        %%% right medial view
+        ax5_4 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(1-1) length_x_2 length_y_2]);
+        patch(ax5_4, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
+                   'EdgeColor', 'none', 'FaceColor', 'interp');
+        hold on;
+        for jj = 1:length(BOUNDARY_rh)
+                plot3(BOUNDARY_rh{jj}(:,1), BOUNDARY_rh{jj}(:,2), BOUNDARY_rh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
+        end
+        hold off;
+        view([-90 0]);
+        caxis(clims)
+        material dull
+        camlight('headlight');
+        colormap(ax5_4, [0.5 0.5 0.5; utils.bluewhitered])
+        axis off
+        axis image
+
+        cbar = colorbar(ax5_4,'southoutside');
+        ylabel(cbar, 'h -- c', 'fontsize', fontsize_label, 'interpreter', 'latex')
+        set(cbar, 'fontsize', fontsize_axis, 'ticklength', 0.0, ...
+            'position', [ax5_4.Position(1)+ax5_4.Position(3)*0.1, ax5_4.Position(2)*0.4, ax5_4.Position(3)*0.8, 0.01], ...
+            'ytick', [ceil(min(clims)), floor(max(clims))])
+
+        annotation('textbox', [ax5_1.Position(1)-0.045, ax5_1.Position(2)-0.048, 0.1, 0.1], 'string', 'LH', ...
+           'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
+           'verticalalignment', 'middle', 'fontweight', 'b')
+        annotation('textbox', [ax5_1.Position(1)-0.045, ax5_3.Position(2)-0.048, 0.1, 0.1], 'string', 'RH', ...
+           'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
+           'verticalalignment', 'middle', 'fontweight', 'b')
     end
-    for jj=1:num_parcels_rh
-        parcel = parcels_rh(jj);
-
-        data_to_plot_rh(find(parc_rh==parcel)) = data_parcel(num_parcels_lh+jj);
-    end
-
-    clims = [min(data_parcel), max(data_parcel)];
-
-    ind_zeros = find(parc_lh==0);
-    data_to_plot_lh(data_to_plot_lh<clims(1)) = clims(1);
-    data_to_plot_lh(data_to_plot_lh>clims(2)) = clims(2);
-    data_to_plot_lh(ind_zeros) = clims(1)*1.1;
-    ind_zeros = find(parc_rh==0);
-    data_to_plot_rh(data_to_plot_rh<clims(1)) = clims(1);
-    data_to_plot_rh(data_to_plot_rh>clims(2)) = clims(2);
-    data_to_plot_rh(ind_zeros) = clims(1)*1.1;
-    clims(1) = clims(1)*1.1;
-    
-    %%% left lateral view
-    ax5_1 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(4-1) length_x_2 length_y_2]);
-    patch(ax5_1, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
-               'EdgeColor', 'none', 'FaceColor', 'interp');
-    hold on;
-    for jj = 1:length(BOUNDARY_lh)
-            plot3(BOUNDARY_lh{jj}(:,1), BOUNDARY_lh{jj}(:,2), BOUNDARY_lh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
-    end
-    hold off;
-    view([-90 0]);
-    caxis(clims)
-    material dull
-    camlight('headlight');
-    colormap(ax5_1, [0.5 0.5 0.5; utils.bluewhitered])
-    axis off
-    axis image
-
-    %%% left medial view
-    ax5_2 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(3-1) length_x_2 length_y_2]);
-    patch(ax5_2, 'Vertices', surface_to_plot_lh.vertices, 'Faces', surface_to_plot_lh.faces, 'FaceVertexCData', data_to_plot_lh, ...
-               'EdgeColor', 'none', 'FaceColor', 'interp');
-    hold on;
-    for jj = 1:length(BOUNDARY_lh)
-            plot3(BOUNDARY_lh{jj}(:,1), BOUNDARY_lh{jj}(:,2), BOUNDARY_lh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
-    end
-    hold off;
-    view([90 0]);
-    caxis(clims)
-    material dull
-    camlight('headlight');
-    colormap(ax5_2, [0.5 0.5 0.5; utils.bluewhitered])
-    axis off
-    axis image
-
-    %%% right lateral view
-    ax5_3 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(2-1) length_x_2 length_y_2]);
-    patch(ax5_3, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
-               'EdgeColor', 'none', 'FaceColor', 'interp');
-    hold on;
-    for jj = 1:length(BOUNDARY_rh)
-            plot3(BOUNDARY_rh{jj}(:,1), BOUNDARY_rh{jj}(:,2), BOUNDARY_rh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
-    end
-    hold off;
-    view([90 0]);
-    caxis(clims)
-    material dull
-    camlight('headlight');
-    colormap(ax5_3, [0.5 0.5 0.5; utils.bluewhitered])
-    axis off
-    axis image
-
-    %%% right medial view
-    ax5_4 = axes('Position', [init_x_2 init_y_2+factor_y_2*length_y_2*(1-1) length_x_2 length_y_2]);
-    patch(ax5_4, 'Vertices', surface_to_plot_rh.vertices, 'Faces', surface_to_plot_rh.faces, 'FaceVertexCData', data_to_plot_rh, ...
-               'EdgeColor', 'none', 'FaceColor', 'interp');
-    hold on;
-    for jj = 1:length(BOUNDARY_rh)
-            plot3(BOUNDARY_rh{jj}(:,1), BOUNDARY_rh{jj}(:,2), BOUNDARY_rh{jj}(:,3), 'Color', 'k', 'LineWidth',1, 'Clipping','off');
-    end
-    hold off;
-    view([-90 0]);
-    caxis(clims)
-    material dull
-    camlight('headlight');
-    colormap(ax5_4, [0.5 0.5 0.5; utils.bluewhitered])
-    axis off
-    axis image
-    
-    cbar = colorbar(ax5_4,'southoutside');
-    ylabel(cbar, 'h -- c', 'fontsize', fontsize_label, 'interpreter', 'latex')
-    set(cbar, 'fontsize', fontsize_axis, 'ticklength', 0.04, ...
-        'position', [ax5_4.Position(1)+ax5_4.Position(3)*0.1, ax5_4.Position(2)*0.3, ax5_4.Position(3)*0.8, 0.01], ...
-        'ytick', [])
-
-    annotation('textbox', [ax5_1.Position(1)-0.04, ax5_1.Position(2)-0.046, 0.1, 0.1], 'string', 'LH', ...
-       'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
-       'verticalalignment', 'middle', 'fontweight', 'b')
-    annotation('textbox', [ax5_1.Position(1)-0.04, ax5_3.Position(2)-0.046, 0.1, 0.1], 'string', 'RH', ...
-       'fontsize', fontsize_axis, 'LineStyle', 'none', 'horizontalalignment', 'center', ...
-       'verticalalignment', 'middle', 'fontweight', 'b')
    
 end
     
@@ -478,7 +480,7 @@ annotation(fig, 'textbox', [0.68, 0.65, 0.01, 0.01], 'string', 'D', 'edgecolor',
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
 annotation(fig, 'textbox', [0.02, 0.31, 0.01, 0.01], 'string', 'E', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')    
-annotation(fig, 'textbox', [0.54, 0.31, 0.01, 0.01], 'string', 'F', 'edgecolor', 'none', ...
+annotation(fig, 'textbox', [0.49, 0.31, 0.01, 0.01], 'string', 'F', 'edgecolor', 'none', ...
         'fontsize', 20, 'fontweight', 'b', 'horizontalalignment', 'center')
     
 %% FIGURE 2
@@ -1236,7 +1238,7 @@ for type_ind = 1:length(types)
     text(max(get(ax1,'xlim'))+5, 34, sprintf('r = %.2g', rho), ...
         'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
     if ~show_padj
-        text(max(get(ax1,'xlim')), 25, utils.extract_pvalue_text(pval), ...
+        text(max(get(ax1,'xlim'))+5, 25, utils.extract_pvalue_text(pval), ...
             'fontsize', fontsize_label-2, 'fontweight', 'bold', 'verticalalignment', 'top', 'horizontalalignment', 'right');
     else
         text(max(get(ax1,'xlim'))+5, 25, utils.extract_pvalue_text(pvals_adj(pvals_adj_ind(0+type_ind)), 1, ''), ...
